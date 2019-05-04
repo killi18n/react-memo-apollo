@@ -1,5 +1,11 @@
 import express from 'express';
 import { ApolloServer, gql } from 'apollo-server-express';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const { MONGO_URI: mongoURI } = process.env;
 
 const memos = [
     {
@@ -34,10 +40,18 @@ const typeDefs = gql`
         writer: String!
         createdAt: String!
     }
+
+    type Mutation {
+        createMemo(content: String!): Memo
+    }
 `;
 
 type FindByIdPayload = {
     id: number;
+};
+
+type CreateMemoPayload = {
+    content: string;
 };
 
 const resolvers = {
@@ -48,9 +62,29 @@ const resolvers = {
             return targetMemo[0];
         },
     },
+    Mutation: {
+        createMemo: (_: any, { content }: CreateMemoPayload) => {
+            const memo = {
+                id: memos[memos.length - 1].id + 1,
+                content,
+                createdAt: '2019-01-23',
+            };
+
+            return memo;
+        },
+    },
 };
 
 const server = new ApolloServer({ typeDefs, resolvers });
+
+mongoose
+    .connect(mongoURI as string)
+    .then(() => {
+        console.log('mongodb connected');
+    })
+    .catch(e => {
+        console.log(e);
+    });
 
 const app = express();
 server.applyMiddleware({ app });
