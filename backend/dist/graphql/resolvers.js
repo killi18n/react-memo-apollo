@@ -40,6 +40,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
 var Memo_1 = __importDefault(require("../models/Memo"));
+var User_1 = __importDefault(require("../models/User"));
 var resolvers = {
     Query: {
         memos: function () { return __awaiter(_this, void 0, void 0, function () {
@@ -81,12 +82,33 @@ var resolvers = {
                 });
             });
         },
+        user: function (_, _a) {
+            var _id = _a._id;
+            return __awaiter(_this, void 0, void 0, function () {
+                var user, e_3;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0:
+                            _b.trys.push([0, 2, , 3]);
+                            return [4 /*yield*/, User_1.default.findById(_id)];
+                        case 1:
+                            user = _b.sent();
+                            return [2 /*return*/, user];
+                        case 2:
+                            e_3 = _b.sent();
+                            console.log(e_3);
+                            return [3 /*break*/, 3];
+                        case 3: return [2 /*return*/];
+                    }
+                });
+            });
+        },
     },
     Mutation: {
         createMemo: function (_, _a) {
             var content = _a.content, writer = _a.writer, createdAt = _a.createdAt;
             return __awaiter(_this, void 0, void 0, function () {
-                var memo, e_3;
+                var memo, e_4;
                 return __generator(this, function (_b) {
                     switch (_b.label) {
                         case 0:
@@ -101,8 +123,8 @@ var resolvers = {
                             _b.sent();
                             return [2 /*return*/, memo];
                         case 2:
-                            e_3 = _b.sent();
-                            console.log(e_3);
+                            e_4 = _b.sent();
+                            console.log(e_4);
                             return [3 /*break*/, 3];
                         case 3: return [2 /*return*/];
                     }
@@ -112,7 +134,7 @@ var resolvers = {
         updateMemo: function (_, _a) {
             var _id = _a._id, content = _a.content;
             return __awaiter(_this, void 0, void 0, function () {
-                var memo, e_4;
+                var memo, e_5;
                 return __generator(this, function (_b) {
                     switch (_b.label) {
                         case 0:
@@ -126,10 +148,42 @@ var resolvers = {
                             memo = _b.sent();
                             return [2 /*return*/, memo];
                         case 2:
-                            e_4 = _b.sent();
-                            console.log(e_4);
+                            e_5 = _b.sent();
+                            console.log(e_5);
                             return [3 /*break*/, 3];
                         case 3: return [2 /*return*/];
+                    }
+                });
+            });
+        },
+        createUser: function (_, _a) {
+            var name = _a.name, password = _a.password;
+            return __awaiter(_this, void 0, void 0, function () {
+                var existing, hashed, user, e_6;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0:
+                            _b.trys.push([0, 3, , 4]);
+                            return [4 /*yield*/, User_1.default.checkExisting(name)];
+                        case 1:
+                            existing = _b.sent();
+                            if (existing) {
+                                return [2 /*return*/];
+                            }
+                            hashed = User_1.default.hashPassword(password);
+                            user = new User_1.default({
+                                name: name,
+                                password: hashed,
+                            });
+                            return [4 /*yield*/, user.save()];
+                        case 2:
+                            _b.sent();
+                            return [2 /*return*/, user];
+                        case 3:
+                            e_6 = _b.sent();
+                            console.log(e_6);
+                            return [3 /*break*/, 4];
+                        case 4: return [2 /*return*/];
                     }
                 });
             });

@@ -1,4 +1,5 @@
 import Memo from '../models/Memo';
+import User from '../models/User';
 import mongoose from 'mongoose';
 
 type FindByIdPayload = {
@@ -16,6 +17,11 @@ type UpdateMemoPayload = {
     content: string;
 };
 
+type CreateUserPayload = {
+    name: string;
+    password: string;
+};
+
 const resolvers = {
     Query: {
         memos: async () => {
@@ -30,6 +36,14 @@ const resolvers = {
             try {
                 const memo = await Memo.findById(_id);
                 return memo;
+            } catch (e) {
+                console.log(e);
+            }
+        },
+        user: async (_: any, { _id }: FindByIdPayload) => {
+            try {
+                const user = await User.findById(_id);
+                return user;
             } catch (e) {
                 console.log(e);
             }
@@ -67,6 +81,24 @@ const resolvers = {
                     }
                 );
                 return memo;
+            } catch (e) {
+                console.log(e);
+            }
+        },
+        createUser: async (_: any, { name, password }: CreateUserPayload) => {
+            try {
+                const existing = await (User as any).checkExisting(name);
+                if (existing) {
+                    return;
+                }
+
+                const hashed = (User as any).hashPassword(password);
+                const user = new User({
+                    name,
+                    password: hashed,
+                });
+                await user.save();
+                return user;
             } catch (e) {
                 console.log(e);
             }
