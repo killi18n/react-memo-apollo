@@ -4,6 +4,7 @@ import { Children } from 'types/common';
 
 type Props = {
     children: Children;
+    onClick?(): any;
 };
 
 const ButtonWrapper = styled.div`
@@ -16,8 +17,8 @@ const ButtonWrapper = styled.div`
     cursor: pointer;
 `;
 
-const Button = ({ children }: Props) => {
-    return <ButtonWrapper>{children}</ButtonWrapper>;
+const Button = ({ children, ...others }: Props) => {
+    return <ButtonWrapper {...others}>{children}</ButtonWrapper>;
 };
 
 export default Button;

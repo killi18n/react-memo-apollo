@@ -1,17 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
+import { Provider } from 'react-redux';
 import App from 'components/App';
+import configure from 'store/configure';
 import 'index.css';
 import * as serviceWorker from './serviceWorker';
 
 const rootElement = document.getElementById('root');
 
+const store = configure();
+
 if (rootElement) {
     const Root = () => (
-        <BrowserRouter>
-            <App />
-        </BrowserRouter>
+        <Provider store={store}>
+            <BrowserRouter>
+                <App />
+            </BrowserRouter>
+        </Provider>
     );
     ReactDOM.render(<Root />, document.getElementById('root'));
 }

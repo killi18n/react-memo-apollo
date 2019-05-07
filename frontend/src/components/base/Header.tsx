@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import Button from 'components/common/Button';
+import { actions as modalActions } from 'store/modules/modal';
 
 const HeaderWrapper = styled.div`
     background: #7048e8;
@@ -24,14 +25,19 @@ const HeaderRight = styled.div`
     font-weight: 650;
 `;
 
-const Header = () => {
+type Props = {
+    ModalActions: typeof modalActions;
+};
+
+const Header = ({ ModalActions }: Props) => {
+    const showLoginModal = () => ModalActions.showModal({ name: 'login' });
     return (
         <HeaderWrapper>
             <HeaderTitle>
                 <Link to="/">React Apollo Memo</Link>
             </HeaderTitle>
             <HeaderRight>
-                <Button>LOG IN</Button>
+                <Button onClick={showLoginModal}>LOG IN</Button>
             </HeaderRight>
         </HeaderWrapper>
     );

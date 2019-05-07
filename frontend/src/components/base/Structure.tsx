@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import Header from 'components/base/Header';
 import { Children } from 'types/common';
+import HeaderContainer from 'containers/HeaderContainer';
 
 type Props = {
     children: Children;
@@ -16,7 +16,7 @@ const Main = styled.div`
 const Structure = ({ children }: Props) => {
     return (
         <div>
-            <Header />
+            <HeaderContainer />
             <Main>{children}</Main>
         </div>
     );

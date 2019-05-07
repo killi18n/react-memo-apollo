@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { Component, Ref } from 'react';
 import styled from 'styled-components';
 import { Children } from 'types/common';
 
 type Props = {
+    visible: boolean;
     children: Children;
+    onClick(): any;
 };
 
 const Wrapper = styled.div`
@@ -19,8 +21,28 @@ const Wrapper = styled.div`
     justify-content: center;
 `;
 
-const ModalWrapper = ({ children }: Props) => {
-    return <Wrapper>{children}</Wrapper>;
-};
+class ModalWrapper extends Component<Props> {
+    private modalWrapperRef = React.createRef<HTMLDivElement>();
+    private innerModalRef = React.createRef<HTMLDivElement>();
+
+    handleClickOverlay = (e: any) => {
+        const { onClick } = this.props;
+        if (this.modalWrapperRef.current) {
+            if (e.target.contains(this.innerModalRef.current)) {
+                onClick();
+            }
+        }
+    };
+
+    render() {
+        const { children } = this.props;
+        const { handleClickOverlay } = this;
+        return (
+            <Wrapper ref={this.modalWrapperRef} onClick={handleClickOverlay}>
+                <div ref={this.innerModalRef}>{children}</div>
+            </Wrapper>
+        );
+    }
+}
 
 export default ModalWrapper;
