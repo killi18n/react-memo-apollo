@@ -1,4 +1,4 @@
-import React, { Component, Ref } from 'react';
+import React, { Component } from 'react';
 import styled from 'styled-components';
 import { Children } from 'types/common';
 

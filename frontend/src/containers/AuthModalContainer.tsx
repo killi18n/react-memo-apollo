@@ -1,4 +1,4 @@
-import React, { useCallback, createRef } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ModalWrapper from 'components/common/ModalWrapper';
 import AuthModal from 'components/modal/AuthModal';
