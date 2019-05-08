@@ -78,5 +78,8 @@ User.statics.checkExisting = function (name) {
         });
     });
 };
+User.methods.checkPassword = function (password) {
+    return this.password === password;
+};
 exports.default = mongoose_1.default.model('User', User);
 //# sourceMappingURL=User.js.map

@@ -36,4 +36,8 @@ User.statics.checkExisting = async function(name: string): Promise<any> {
     }
 };
 
+User.methods.checkPassword = function(password: string): boolean {
+    return this.password === password;
+};
+
 export default mongoose.model('User', User);

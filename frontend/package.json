@@ -7,8 +7,14 @@
         "@types/node": "12.0.0",
         "@types/react": "16.8.16",
         "@types/react-dom": "16.8.4",
+        "apollo-cache-inmemory": "^1.5.1",
+        "apollo-client": "^2.5.1",
+        "apollo-link-http": "^1.5.14",
+        "graphql": "^14.3.0",
+        "graphql-tag": "^2.10.1",
         "immer": "^3.1.1",
         "react": "^16.8.6",
+        "react-apollo": "^2.5.5",
         "react-dom": "^16.8.6",
         "react-redux": "^7.1.0-alpha.4",
         "react-router-dom": "^5.0.0",
@@ -40,6 +46,7 @@
         ]
     },
     "devDependencies": {
+        "@types/graphql": "^14.2.0",
         "@types/react-redux": "^7.0.8",
         "@types/react-router-dom": "^4.3.2",
         "@types/redux-actions": "^2.6.0",

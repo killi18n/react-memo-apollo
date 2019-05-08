@@ -188,6 +188,34 @@ var resolvers = {
                 });
             });
         },
+        checkUser: function (_, _a) {
+            var name = _a.name, password = _a.password;
+            return __awaiter(_this, void 0, void 0, function () {
+                var isExisting, passwordCheck, e_7;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0:
+                            _b.trys.push([0, 2, , 3]);
+                            return [4 /*yield*/, User_1.default.checkExisting(name)];
+                        case 1:
+                            isExisting = _b.sent();
+                            if (!isExisting) {
+                                return [2 /*return*/, null];
+                            }
+                            passwordCheck = isExisting.checkPassword(password);
+                            if (!passwordCheck) {
+                                return [2 /*return*/, null];
+                            }
+                            return [2 /*return*/, isExisting];
+                        case 2:
+                            e_7 = _b.sent();
+                            console.log(e_7);
+                            return [3 /*break*/, 3];
+                        case 3: return [2 /*return*/];
+                    }
+                });
+            });
+        },
     },
 };
 exports.default = resolvers;

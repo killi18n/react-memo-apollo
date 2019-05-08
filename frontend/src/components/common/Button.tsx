@@ -5,6 +5,7 @@ import { Children } from 'types/common';
 type Props = {
     children: Children;
     onClick?(): any;
+    style?: any;
 };
 
 const ButtonWrapper = styled.div`

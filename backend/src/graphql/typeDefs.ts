@@ -26,6 +26,7 @@ const typeDefs = gql`
         createMemo(content: String!, writer: String!, createdAt: String!): Memo
         updateMemo(_id: ID!, content: String): Memo
         createUser(name: String!, password: String!): User
+        checkUser(name: String!, password: String!): User
     }
 `;
 

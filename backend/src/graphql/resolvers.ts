@@ -22,6 +22,11 @@ type CreateUserPayload = {
     password: string;
 };
 
+type CheckUserPayload = {
+    name: string;
+    password: string;
+};
+
 const resolvers = {
     Query: {
         memos: async () => {
@@ -99,6 +104,21 @@ const resolvers = {
                 });
                 await user.save();
                 return user;
+            } catch (e) {
+                console.log(e);
+            }
+        },
+        checkUser: async (_: any, { name, password }: CheckUserPayload) => {
+            try {
+                const isExisting = await (User as any).checkExisting(name);
+                if (!isExisting) {
+                    return null;
+                }
+                const passwordCheck = isExisting.checkPassword(password);
+                if (!passwordCheck) {
+                    return null;
+                }
+                return isExisting;
             } catch (e) {
                 console.log(e);
             }

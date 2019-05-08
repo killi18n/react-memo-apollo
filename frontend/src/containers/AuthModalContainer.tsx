@@ -4,7 +4,23 @@ import ModalWrapper from 'components/common/ModalWrapper';
 import AuthModal from 'components/modal/AuthModal';
 import { State } from 'store/modules';
 import { bindActionCreators } from 'redux';
-import { actions as modalActions } from 'store/modules/modal';
+import gql from 'graphql-tag';
+import { Query, Mutation } from 'react-apollo';
+import {
+    actions as modalActions,
+    ModalVisiblePayload,
+} from 'store/modules/modal';
+import { NameValueType, GraphqlData } from 'types/common';
+
+const CREATE_USER = gql`
+    mutation CreateUser($name: String!, $password: String!) {
+        createUser(name: $name, password: $password) {
+            _id
+            name
+            createdAt
+        }
+    }
+`;
 
 const AuthModalContainer = () => {
     const dispatch = useDispatch();
@@ -14,8 +30,18 @@ const AuthModalContainer = () => {
     const registerModalVisible = useSelector(
         ({ modal }: State) => modal.visible.register
     );
+    const username = useSelector(({ modal }: State) => modal.input.username);
+    const password = useSelector(({ modal }: State) => modal.input.password);
 
     const ModalActions = bindActionCreators(modalActions, dispatch);
+
+    const hideModal = ({ name }: ModalVisiblePayload) =>
+        ModalActions.hideModal({ name });
+    const showModal = ({ name }: ModalVisiblePayload) =>
+        ModalActions.showModal({ name });
+    const changeInput = ({ name, value }: NameValueType) =>
+        ModalActions.changeInput({ name, value });
+    const initializeInput = () => ModalActions.initializeInput();
 
     if (loginModalVisible) {
         return (
@@ -23,7 +49,15 @@ const AuthModalContainer = () => {
                 visible={loginModalVisible}
                 onClick={() => ModalActions.hideAllModal()}
             >
-                <AuthModal type="login" />
+                <AuthModal
+                    type="login"
+                    hideModal={hideModal}
+                    showModal={showModal}
+                    onChange={changeInput}
+                    initializeInput={initializeInput}
+                    username={username}
+                    password={password}
+                />
             </ModalWrapper>
         );
     }
@@ -34,7 +68,31 @@ const AuthModalContainer = () => {
                 visible={registerModalVisible}
                 onClick={() => ModalActions.hideAllModal()}
             >
-                <AuthModal type="register" />
+                <Mutation
+                    mutation={CREATE_USER}
+                    onCompleted={(payload: any) => {
+                        if (payload) {
+                            // todo: LOGIN
+                        }
+                    }}
+                >
+                    {(
+                        createUser: any,
+                        { data, loading, error }: GraphqlData
+                    ) => (
+                        <AuthModal
+                            type="register"
+                            hideModal={hideModal}
+                            showModal={showModal}
+                            onRegister={createUser}
+                            onChange={changeInput}
+                            initializeInput={initializeInput}
+                            username={username}
+                            password={password}
+                            loading={loading}
+                        />
+                    )}
+                </Mutation>
             </ModalWrapper>
         );
     }

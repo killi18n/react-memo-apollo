@@ -2,6 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import { ApolloClient } from 'apollo-client';
+import { HttpLink } from 'apollo-link-http';
+import { InMemoryCache } from 'apollo-cache-inmemory';
+import { ApolloProvider } from 'react-apollo';
 import App from 'components/App';
 import configure from 'store/configure';
 import 'index.css';
@@ -9,15 +13,28 @@ import * as serviceWorker from './serviceWorker';
 
 const rootElement = document.getElementById('root');
 
+const httpLink = new HttpLink({
+    uri: 'http://localhost:4000/graphql',
+});
+
+const cache = new InMemoryCache();
+
+const client = new ApolloClient({
+    link: httpLink,
+    cache,
+});
+
 const store = configure();
 
 if (rootElement) {
     const Root = () => (
-        <Provider store={store}>
-            <BrowserRouter>
-                <App />
-            </BrowserRouter>
-        </Provider>
+        <ApolloProvider client={client}>
+            <Provider store={store}>
+                <BrowserRouter>
+                    <App />
+                </BrowserRouter>
+            </Provider>
+        </ApolloProvider>
     );
     ReactDOM.render(<Root />, document.getElementById('root'));
 }
