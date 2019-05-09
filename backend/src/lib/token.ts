@@ -1,5 +1,6 @@
 import token from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { Request, Response } from 'express';
 dotenv.config();
 
 const { JWT_SECRET_KEY: secret } = process.env;
@@ -37,9 +38,9 @@ export const decodeToken = (jwtToken: string): Promise<object | string> => {
     });
 };
 
-export const jwtMiddleware = async (ctx, next) => {
-    try {
-    } catch (e) {
-        ctx.request.user = null;
-    }
+export const jwtMiddleware = async (req: Request, res: Response, next: any) => {
+    // try {
+    // } catch (e) {
+    //     req.cook
+    // }
 };
