@@ -5,6 +5,7 @@ const typeDefs = gql`
         memos: [Memo]
         memo(_id: ID!): Memo!
         user(_id: ID!): User!
+        findUserByNameAndPassword(name: String!, password: String!): User
     }
 
     type Memo {
@@ -26,7 +27,6 @@ const typeDefs = gql`
         createMemo(content: String!, writer: String!, createdAt: String!): Memo
         updateMemo(_id: ID!, content: String): Memo
         createUser(name: String!, password: String!): User
-        checkUser(name: String!, password: String!): User
     }
 `;
 

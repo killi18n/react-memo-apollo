@@ -22,7 +22,7 @@ type CreateUserPayload = {
     password: string;
 };
 
-type CheckUserPayload = {
+type FindUserPayload = {
     name: string;
     password: string;
 };
@@ -48,6 +48,27 @@ const resolvers = {
         user: async (_: any, { _id }: FindByIdPayload) => {
             try {
                 const user = await User.findById(_id);
+                return user;
+            } catch (e) {
+                console.log(e);
+            }
+        },
+        findUserByNameAndPassword: async (
+            _: any,
+            { name, password }: FindUserPayload
+        ) => {
+            try {
+                const user = await (User as any).checkExisting(name);
+
+                if (!user) {
+                    return null;
+                }
+                const hashedPassword = (User as any).hashPassword(password);
+                const passwordCheck = user.checkPassword(hashedPassword);
+
+                if (!passwordCheck) {
+                    return null;
+                }
                 return user;
             } catch (e) {
                 console.log(e);
@@ -108,21 +129,21 @@ const resolvers = {
                 console.log(e);
             }
         },
-        checkUser: async (_: any, { name, password }: CheckUserPayload) => {
-            try {
-                const isExisting = await (User as any).checkExisting(name);
-                if (!isExisting) {
-                    return null;
-                }
-                const passwordCheck = isExisting.checkPassword(password);
-                if (!passwordCheck) {
-                    return null;
-                }
-                return isExisting;
-            } catch (e) {
-                console.log(e);
-            }
-        },
+        // checkUser: async (_: any, { name, password }: CheckUserPayload) => {
+        //     try {
+        //         const isExisting = await (User as any).checkExisting(name);
+        //         if (!isExisting) {
+        //             return null;
+        //         }
+        //         const passwordCheck = isExisting.checkPassword(password);
+        //         if (!passwordCheck) {
+        //             return null;
+        //         }
+        //         return isExisting;
+        //     } catch (e) {
+        //         console.log(e);
+        //     }
+        // },
     },
 };
 
