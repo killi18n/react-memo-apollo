@@ -5,7 +5,7 @@ import AuthModal from 'components/modal/AuthModal';
 import { State } from 'store/modules';
 import { bindActionCreators } from 'redux';
 import gql from 'graphql-tag';
-import { Query, Mutation } from 'react-apollo';
+import { Mutation } from 'react-apollo';
 import {
     actions as modalActions,
     ModalVisiblePayload,
