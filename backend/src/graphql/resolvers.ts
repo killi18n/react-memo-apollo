@@ -1,6 +1,7 @@
 import Memo from '../models/Memo';
 import User from '../models/User';
 import mongoose from 'mongoose';
+import { generateToken } from 'lib/token';
 
 type FindByIdPayload = {
     _id: mongoose.Types.ObjectId;
@@ -48,27 +49,6 @@ const resolvers = {
         user: async (_: any, { _id }: FindByIdPayload) => {
             try {
                 const user = await User.findById(_id);
-                return user;
-            } catch (e) {
-                console.log(e);
-            }
-        },
-        findUserByNameAndPassword: async (
-            _: any,
-            { name, password }: FindUserPayload
-        ) => {
-            try {
-                const user = await (User as any).checkExisting(name);
-
-                if (!user) {
-                    return null;
-                }
-                const hashedPassword = (User as any).hashPassword(password);
-                const passwordCheck = user.checkPassword(hashedPassword);
-
-                if (!passwordCheck) {
-                    return null;
-                }
                 return user;
             } catch (e) {
                 console.log(e);
@@ -125,6 +105,37 @@ const resolvers = {
                 });
                 await user.save();
                 return user;
+            } catch (e) {
+                console.log(e);
+            }
+        },
+        findUserByNameAndPassword: async (
+            _: any,
+            { name, password }: FindUserPayload
+        ) => {
+            try {
+                const user = await (User as any).checkExisting(name);
+                console.log(user);
+                if (!user) {
+                    return null;
+                }
+                const hashedPassword = (User as any).hashPassword(password);
+                const passwordCheck = user.checkPassword(hashedPassword);
+
+                if (!passwordCheck) {
+                    return null;
+                }
+
+                const token = await generateToken({
+                    _id: user._id,
+                    name: user.name,
+                });
+                console.log('token', token);
+                return {
+                    _id: user._id,
+                    name: user.name,
+                    jwt: token,
+                };
             } catch (e) {
                 console.log(e);
             }

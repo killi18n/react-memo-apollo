@@ -47,6 +47,7 @@ type Props = {
     hideModal({ name }: ModalVisiblePayload): any;
     showModal({ name }: ModalVisiblePayload): any;
     onRegister?: any;
+    onLogin?: any;
     onChange({ name, value }: NameValueType): any;
     initializeInput(): any;
     username: string;
@@ -63,6 +64,7 @@ const AuthModal = ({
     username,
     password,
     onRegister,
+    onLogin,
     loading,
 }: Props) => {
     return (
@@ -107,8 +109,11 @@ const AuthModal = ({
                             alignItems: 'center',
                             justifyContent: 'center',
                         }}
+                        onClick={() =>
+                            onLogin({ variables: { name: username, password } })
+                        }
                     >
-                        LOGIN
+                        {loading ? 'LOADING...' : 'LOGIN'}
                     </Button>
                     <Button
                         style={{

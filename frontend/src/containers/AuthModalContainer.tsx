@@ -5,12 +5,13 @@ import AuthModal from 'components/modal/AuthModal';
 import { State } from 'store/modules';
 import { bindActionCreators } from 'redux';
 import gql from 'graphql-tag';
-import { Mutation } from 'react-apollo';
+import { Mutation, Query } from 'react-apollo';
 import {
     actions as modalActions,
     ModalVisiblePayload,
 } from 'store/modules/modal';
 import { NameValueType, GraphqlData } from 'types/common';
+import { authActions } from 'store/modules/auth';
 
 const CREATE_USER = gql`
     mutation CreateUser($name: String!, $password: String!) {
@@ -18,6 +19,16 @@ const CREATE_USER = gql`
             _id
             name
             createdAt
+        }
+    }
+`;
+
+const FIND_USER_BY_NAME_AND_PASSWORD = gql`
+    mutation FindUserByNameAndPassword($name: String!, $password: String!) {
+        findUserByNameAndPassword(name: $name, password: $password) {
+            _id
+            name
+            jwt
         }
     }
 `;
@@ -34,6 +45,7 @@ const AuthModalContainer = () => {
     const password = useSelector(({ modal }: State) => modal.input.password);
 
     const ModalActions = bindActionCreators(modalActions, dispatch);
+    const AuthActions = bindActionCreators(authActions, dispatch);
 
     const hideModal = ({ name }: ModalVisiblePayload) =>
         ModalActions.hideModal({ name });
@@ -42,6 +54,7 @@ const AuthModalContainer = () => {
     const changeInput = ({ name, value }: NameValueType) =>
         ModalActions.changeInput({ name, value });
     const initializeInput = () => ModalActions.initializeInput();
+    const setLogged = () => AuthActions.setLogged();
 
     if (loginModalVisible) {
         return (
@@ -49,15 +62,42 @@ const AuthModalContainer = () => {
                 visible={loginModalVisible}
                 onClick={() => ModalActions.hideAllModal()}
             >
-                <AuthModal
-                    type="login"
-                    hideModal={hideModal}
-                    showModal={showModal}
-                    onChange={changeInput}
-                    initializeInput={initializeInput}
-                    username={username}
-                    password={password}
-                />
+                <Mutation
+                    mutation={FIND_USER_BY_NAME_AND_PASSWORD}
+                    onCompleted={(loginPayload: any) => {
+                        const { findUserByNameAndPassword } = loginPayload;
+                        const { jwt, name, _id } = findUserByNameAndPassword;
+                        localStorage.setItem(
+                            'userInfo',
+                            JSON.stringify({
+                                jwt,
+                                name,
+                                _id,
+                            })
+                        );
+                        setLogged();
+                        hideModal({ name: 'login' });
+                    }}
+                >
+                    {(
+                        findUserByNameAndPassword: any,
+                        { data, error, loading }: GraphqlData
+                    ) => {
+                        return (
+                            <AuthModal
+                                type="login"
+                                hideModal={hideModal}
+                                showModal={showModal}
+                                onChange={changeInput}
+                                initializeInput={initializeInput}
+                                username={username}
+                                password={password}
+                                onLogin={findUserByNameAndPassword}
+                                loading={loading}
+                            />
+                        );
+                    }}
+                </Mutation>
             </ModalWrapper>
         );
     }
@@ -73,25 +113,28 @@ const AuthModalContainer = () => {
                     onCompleted={(payload: any) => {
                         if (payload) {
                             // todo: LOGIN
+                            hideModal({ name: 'register' });
                         }
                     }}
                 >
                     {(
                         createUser: any,
                         { data, loading, error }: GraphqlData
-                    ) => (
-                        <AuthModal
-                            type="register"
-                            hideModal={hideModal}
-                            showModal={showModal}
-                            onRegister={createUser}
-                            onChange={changeInput}
-                            initializeInput={initializeInput}
-                            username={username}
-                            password={password}
-                            loading={loading}
-                        />
-                    )}
+                    ) => {
+                        return (
+                            <AuthModal
+                                type="register"
+                                hideModal={hideModal}
+                                showModal={showModal}
+                                onRegister={createUser}
+                                onChange={changeInput}
+                                initializeInput={initializeInput}
+                                username={username}
+                                password={password}
+                                loading={loading}
+                            />
+                        );
+                    }}
                 </Mutation>
             </ModalWrapper>
         );

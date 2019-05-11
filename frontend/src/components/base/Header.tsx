@@ -27,9 +27,10 @@ const HeaderRight = styled.div`
 
 type Props = {
     ModalActions: typeof modalActions;
+    logged: boolean;
 };
 
-const Header = ({ ModalActions }: Props) => {
+const Header = ({ ModalActions, logged }: Props) => {
     const showLoginModal = () => ModalActions.showModal({ name: 'login' });
     return (
         <HeaderWrapper>
@@ -37,7 +38,11 @@ const Header = ({ ModalActions }: Props) => {
                 <Link to="/">React Apollo Memo</Link>
             </HeaderTitle>
             <HeaderRight>
-                <Button onClick={showLoginModal}>LOG IN</Button>
+                {!logged ? (
+                    <Button onClick={showLoginModal}>LOG IN</Button>
+                ) : (
+                    <Button>LOG OUT</Button>
+                )}
             </HeaderRight>
         </HeaderWrapper>
     );
