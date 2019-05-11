@@ -5,7 +5,7 @@ import AuthModal from 'components/modal/AuthModal';
 import { State } from 'store/modules';
 import { bindActionCreators } from 'redux';
 import gql from 'graphql-tag';
-import { Mutation, Query } from 'react-apollo';
+import { Mutation } from 'react-apollo';
 import {
     actions as modalActions,
     ModalVisiblePayload,
@@ -55,7 +55,8 @@ const AuthModalContainer = () => {
     const changeInput = ({ name, value }: NameValueType) =>
         ModalActions.changeInput({ name, value });
     const initializeInput = () => ModalActions.initializeInput();
-    const setLogged = () => AuthActions.setLogged();
+    const setLogged = (isLoggedIn: boolean) =>
+        AuthActions.setLogged(isLoggedIn);
     const setError = ({ errorNumber, description }: ErrorType) =>
         AuthActions.setError({ errorNumber, description });
 
@@ -84,7 +85,7 @@ const AuthModalContainer = () => {
                                     _id,
                                 })
                             );
-                            setLogged();
+                            setLogged(true);
                             hideModal({ name: 'login' });
                             return;
                         }
@@ -146,7 +147,7 @@ const AuthModalContainer = () => {
                                     _id,
                                 })
                             );
-                            setLogged();
+                            setLogged(true);
                             hideModal({ name: 'register' });
                         }
                     }}

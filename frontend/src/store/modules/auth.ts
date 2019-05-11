@@ -10,7 +10,7 @@ export type ErrorType = {
 };
 
 export const authActions = {
-    setLogged: createAction(SET_LOGGED),
+    setLogged: createAction(SET_LOGGED, (payload: boolean) => payload),
     setError: createAction(SET_ERROR, (payload: ErrorType) => payload),
 };
 
@@ -36,9 +36,10 @@ type SetErrorAction = {
 
 const reducer = handleActions(
     {
-        [SET_LOGGED]: (state: State) => {
+        [SET_LOGGED]: (state: State, action: any) => {
             return produce(state, draft => {
-                draft.logged = true;
+                const { payload } = action;
+                draft.logged = payload;
             });
         },
         [SET_ERROR]: (state: State, action: SetErrorAction) => {

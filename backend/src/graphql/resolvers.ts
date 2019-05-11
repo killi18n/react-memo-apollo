@@ -1,7 +1,7 @@
 import Memo from '../models/Memo';
 import User from '../models/User';
 import mongoose from 'mongoose';
-import { generateToken } from 'lib/token';
+import { generateToken, decodeToken } from 'lib/token';
 
 type FindByIdPayload = {
     _id: mongoose.Types.ObjectId;
@@ -28,6 +28,10 @@ type FindUserPayload = {
     password: string;
 };
 
+type TokenType = {
+    token: string;
+};
+
 const resolvers = {
     Query: {
         memos: async () => {
@@ -52,6 +56,19 @@ const resolvers = {
                 return user;
             } catch (e) {
                 console.log(e);
+            }
+        },
+        checkUserLoggedIn: async (_: any, { token }: TokenType) => {
+            try {
+                const decoded = await decodeToken(token);
+                const user = await User.findById((decoded as any)._id);
+                if (!user) {
+                    return null;
+                }
+                return user;
+            } catch (e) {
+                console.log(e);
+                return null;
             }
         },
     },
@@ -149,26 +166,12 @@ const resolvers = {
                     _id: user._id,
                     name: user.name,
                     jwt: token,
+                    error: null,
                 };
             } catch (e) {
                 console.log(e);
             }
         },
-        // checkUser: async (_: any, { name, password }: CheckUserPayload) => {
-        //     try {
-        //         const isExisting = await (User as any).checkExisting(name);
-        //         if (!isExisting) {
-        //             return null;
-        //         }
-        //         const passwordCheck = isExisting.checkPassword(password);
-        //         if (!passwordCheck) {
-        //             return null;
-        //         }
-        //         return isExisting;
-        //     } catch (e) {
-        //         console.log(e);
-        //     }
-        // },
     },
 };
 

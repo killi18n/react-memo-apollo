@@ -1,12 +1,6 @@
 import { gql } from 'apollo-server-express';
 
 const typeDefs = gql`
-    type Query {
-        memos: [Memo]
-        memo(_id: ID!): Memo!
-        user(_id: ID!): User!
-    }
-
     type Memo {
         _id: ID!
         content: String!
@@ -26,7 +20,14 @@ const typeDefs = gql`
         _id: ID
         name: String
         jwt: String
-        error: Int!
+        error: Int
+    }
+
+    type Query {
+        memos: [Memo]
+        memo(_id: ID!): Memo!
+        user(_id: ID!): User!
+        checkUserLoggedIn(token: String!): User
     }
 
     type Mutation {

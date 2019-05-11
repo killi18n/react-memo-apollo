@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { ApolloClient } from 'apollo-client';
 import { HttpLink } from 'apollo-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';
+import { setContext } from 'apollo-link-context';
 import { ApolloProvider } from 'react-apollo';
 import App from 'components/App';
 import configure from 'store/configure';
@@ -13,6 +14,25 @@ import * as serviceWorker from './serviceWorker';
 
 const rootElement = document.getElementById('root');
 
+const authLink = setContext((_, { headers }) => {
+    const userInfoStorage = localStorage.getItem('userInfo');
+    if (!userInfoStorage) {
+        return {
+            headers: {
+                ...headers,
+                authorization: '',
+            },
+        };
+    }
+    const token = JSON.parse(userInfoStorage).jwt;
+    return {
+        headers: {
+            ...headers,
+            authorization: token,
+        },
+    };
+});
+
 const httpLink = new HttpLink({
     uri: 'http://localhost:4000/graphql',
 });
@@ -20,7 +40,7 @@ const httpLink = new HttpLink({
 const cache = new InMemoryCache();
 
 const client = new ApolloClient({
-    link: httpLink,
+    link: authLink.concat(httpLink),
     cache,
 });
 

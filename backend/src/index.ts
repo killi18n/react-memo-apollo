@@ -2,14 +2,35 @@ import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import typeDefs from './graphql/typeDefs';
-import resolvers from './graphql/resolvers';
+import { decodeToken } from 'lib/token';
+import typeDefs from 'graphql/typeDefs';
+import resolvers from 'graphql/resolvers';
 
 dotenv.config();
 
 const { MONGO_URI: mongoURI } = process.env;
 
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: async ({ req }) => {
+        try {
+            const token = req.headers.authorization;
+            if (!token) {
+                return {
+                    decodedToken: null,
+                };
+            }
+            const decoded = await decodeToken(token);
+            return {
+                decodedToken: decoded,
+            };
+        } catch (e) {
+            console.log(e);
+            throw new Error('not logged in');
+        }
+    },
+});
 
 mongoose
     .connect(mongoURI as string)
