@@ -28,9 +28,10 @@ const HeaderRight = styled.div`
 type Props = {
     ModalActions: typeof modalActions;
     logged: boolean;
+    setLogged(isLoggedIn: boolean): void;
 };
 
-const Header = ({ ModalActions, logged }: Props) => {
+const Header = ({ ModalActions, logged, setLogged }: Props) => {
     const showLoginModal = () => ModalActions.showModal({ name: 'login' });
     return (
         <HeaderWrapper>
@@ -41,7 +42,19 @@ const Header = ({ ModalActions, logged }: Props) => {
                 {!logged ? (
                     <Button onClick={showLoginModal}>LOG IN</Button>
                 ) : (
-                    <Button>LOG OUT</Button>
+                    <Button
+                        onClick={() => {
+                            new Promise((resolve, reject) => {
+                                setTimeout(() => {
+                                    localStorage.clear();
+                                    setLogged(false);
+                                    resolve();
+                                }, 3000);
+                            });
+                        }}
+                    >
+                        LOG OUT
+                    </Button>
                 )}
             </HeaderRight>
         </HeaderWrapper>
