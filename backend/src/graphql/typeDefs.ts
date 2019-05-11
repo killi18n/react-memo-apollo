@@ -22,17 +22,21 @@ const typeDefs = gql`
         createdAt: String!
     }
 
-    type Login {
-        _id: ID!
-        name: String!
-        jwt: String!
+    type LoginOrRegister {
+        _id: ID
+        name: String
+        jwt: String
+        error: Int!
     }
 
     type Mutation {
         createMemo(content: String!, writer: String!, createdAt: String!): Memo
         updateMemo(_id: ID!, content: String): Memo
-        createUser(name: String!, password: String!): User
-        findUserByNameAndPassword(name: String!, password: String!): Login
+        createUser(name: String!, password: String!): LoginOrRegister
+        findUserByNameAndPassword(
+            name: String!
+            password: String!
+        ): LoginOrRegister
     }
 `;
 

@@ -103,8 +103,18 @@ const resolvers = {
                     name,
                     password: hashed,
                 });
+
                 await user.save();
-                return user;
+                const token = await generateToken({
+                    _id: user._id,
+                    name: (user as any).name,
+                });
+
+                return {
+                    _id: user._id,
+                    name: (user as any).name,
+                    jwt: token,
+                };
             } catch (e) {
                 console.log(e);
             }
@@ -115,22 +125,26 @@ const resolvers = {
         ) => {
             try {
                 const user = await (User as any).checkExisting(name);
-                console.log(user);
+
                 if (!user) {
-                    return null;
+                    return {
+                        error: 404,
+                    };
                 }
                 const hashedPassword = (User as any).hashPassword(password);
                 const passwordCheck = user.checkPassword(hashedPassword);
 
                 if (!passwordCheck) {
-                    return null;
+                    return {
+                        error: 401,
+                    };
                 }
 
                 const token = await generateToken({
                     _id: user._id,
                     name: user.name,
                 });
-                console.log('token', token);
+
                 return {
                     _id: user._id,
                     name: user.name,

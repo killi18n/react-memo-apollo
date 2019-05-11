@@ -11,14 +11,14 @@ import {
     ModalVisiblePayload,
 } from 'store/modules/modal';
 import { NameValueType, GraphqlData } from 'types/common';
-import { authActions } from 'store/modules/auth';
+import { authActions, ErrorType } from 'store/modules/auth';
 
 const CREATE_USER = gql`
     mutation CreateUser($name: String!, $password: String!) {
         createUser(name: $name, password: $password) {
             _id
             name
-            createdAt
+            jwt
         }
     }
 `;
@@ -29,6 +29,7 @@ const FIND_USER_BY_NAME_AND_PASSWORD = gql`
             _id
             name
             jwt
+            error
         }
     }
 `;
@@ -55,6 +56,8 @@ const AuthModalContainer = () => {
         ModalActions.changeInput({ name, value });
     const initializeInput = () => ModalActions.initializeInput();
     const setLogged = () => AuthActions.setLogged();
+    const setError = ({ errorNumber, description }: ErrorType) =>
+        AuthActions.setError({ errorNumber, description });
 
     if (loginModalVisible) {
         return (
@@ -66,17 +69,38 @@ const AuthModalContainer = () => {
                     mutation={FIND_USER_BY_NAME_AND_PASSWORD}
                     onCompleted={(loginPayload: any) => {
                         const { findUserByNameAndPassword } = loginPayload;
-                        const { jwt, name, _id } = findUserByNameAndPassword;
-                        localStorage.setItem(
-                            'userInfo',
-                            JSON.stringify({
-                                jwt,
-                                name,
-                                _id,
-                            })
-                        );
-                        setLogged();
-                        hideModal({ name: 'login' });
+                        const {
+                            jwt,
+                            name,
+                            _id,
+                            error,
+                        } = findUserByNameAndPassword;
+                        if (jwt && name && _id) {
+                            localStorage.setItem(
+                                'userInfo',
+                                JSON.stringify({
+                                    jwt,
+                                    name,
+                                    _id,
+                                })
+                            );
+                            setLogged();
+                            hideModal({ name: 'login' });
+                            return;
+                        }
+                        if (error) {
+                            // todo: Set error on redux
+                            let description = '';
+
+                            if (error === 404) {
+                                description =
+                                    '로그인 하고자 하는 아이디가 없습니다.';
+                            }
+                            if (error === 401) {
+                                description = '패스워드가 일치하지 않습니다.';
+                            }
+                            setError({ errorNumber: error, description });
+                        }
                     }}
                 >
                     {(
@@ -110,9 +134,19 @@ const AuthModalContainer = () => {
             >
                 <Mutation
                     mutation={CREATE_USER}
-                    onCompleted={(payload: any) => {
-                        if (payload) {
-                            // todo: LOGIN
+                    onCompleted={(registerPayload: any) => {
+                        if (registerPayload) {
+                            const { createUser } = registerPayload;
+                            const { jwt, name, _id } = createUser;
+                            localStorage.setItem(
+                                'userInfo',
+                                JSON.stringify({
+                                    jwt,
+                                    name,
+                                    _id,
+                                })
+                            );
+                            setLogged();
                             hideModal({ name: 'register' });
                         }
                     }}
