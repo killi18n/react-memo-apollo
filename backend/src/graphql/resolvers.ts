@@ -67,7 +67,7 @@ const resolvers = {
                 }
                 return user;
             } catch (e) {
-                console.log(e);
+                console.log('error', e);
                 return null;
             }
         },
