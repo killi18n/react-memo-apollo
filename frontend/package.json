@@ -50,9 +50,11 @@
     },
     "devDependencies": {
         "@types/graphql": "^14.2.0",
+        "@types/react-helmet": "^5.0.8",
         "@types/react-redux": "^7.0.8",
         "@types/react-router-dom": "^4.3.2",
         "@types/redux-actions": "^2.6.0",
-        "@types/styled-components": "^4.1.14"
+        "@types/styled-components": "^4.1.14",
+        "react-helmet": "^5.2.1"
     }
 }
