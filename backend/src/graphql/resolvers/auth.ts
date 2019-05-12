@@ -1,5 +1,4 @@
-import Memo from '../models/Memo';
-import User from '../models/User';
+import User from 'models/User';
 import mongoose from 'mongoose';
 import joi from 'joi';
 import { generateToken, decodeToken } from 'lib/token';
@@ -8,15 +7,8 @@ type FindByIdPayload = {
     _id: mongoose.Types.ObjectId;
 };
 
-type CreateMemoPayload = {
-    content: string;
-    writer: string;
-    createdAt: string;
-};
-
-type UpdateMemoPayload = {
-    _id: mongoose.Types.ObjectId;
-    content: string;
+type TokenType = {
+    token: string;
 };
 
 type CreateUserPayload = {
@@ -29,28 +21,8 @@ type FindUserPayload = {
     password: string;
 };
 
-type TokenType = {
-    token: string;
-};
-
-const resolvers = {
+const resolver = {
     Query: {
-        memos: async () => {
-            try {
-                const memos = await Memo.find();
-                return memos;
-            } catch (e) {
-                console.log(e);
-            }
-        },
-        memo: async (_: any, { _id }: FindByIdPayload) => {
-            try {
-                const memo = await Memo.findById(_id);
-                return memo;
-            } catch (e) {
-                console.log(e);
-            }
-        },
         user: async (_: any, { _id }: FindByIdPayload) => {
             try {
                 const user = await User.findById(_id);
@@ -73,42 +45,8 @@ const resolvers = {
             }
         },
     },
+
     Mutation: {
-        createMemo: async (
-            _: any,
-            { content, writer, createdAt }: CreateMemoPayload
-        ): Promise<any> => {
-            try {
-                const memo = new Memo({
-                    content,
-                    writer,
-                    createdAt,
-                });
-                await memo.save();
-                return memo;
-            } catch (e) {
-                console.log(e);
-            }
-        },
-        updateMemo: async (
-            _: any,
-            { _id, content }: UpdateMemoPayload
-        ): Promise<any> => {
-            try {
-                const memo = await Memo.findByIdAndUpdate(
-                    _id,
-                    {
-                        content,
-                    },
-                    {
-                        new: true,
-                    }
-                );
-                return memo;
-            } catch (e) {
-                console.log(e);
-            }
-        },
         createUser: async (_: any, { name, password }: CreateUserPayload) => {
             // validate name, password
             const schema = joi.object().keys({
@@ -215,4 +153,4 @@ const resolvers = {
     },
 };
 
-export default resolvers;
+export default resolver;
