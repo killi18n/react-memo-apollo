@@ -10,7 +10,9 @@ type Props = {
 const Main = styled.div`
     margin-left: auto;
     margin-right: auto;
-    width: 625px;
+    max-width: 625px;
+    padding-left: 1rem;
+    padding-right: 1rem;
 `;
 
 const Structure = ({ children }: Props) => {
