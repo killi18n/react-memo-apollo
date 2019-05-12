@@ -3,6 +3,7 @@ import produce from 'immer';
 
 const SET_LOGGED = '@auth/SET_LOGGED';
 const SET_ERROR = '@auth/SET_ERROR';
+const INITIALIZE_ERROR = '@auth/INITIALIZE_ERROR';
 
 export type ErrorType = {
     errorNumber: number;
@@ -12,6 +13,7 @@ export type ErrorType = {
 export const authActions = {
     setLogged: createAction(SET_LOGGED, (payload: boolean) => payload),
     setError: createAction(SET_ERROR, (payload: ErrorType) => payload),
+    initializeError: createAction(INITIALIZE_ERROR),
 };
 
 export type State = {
@@ -49,6 +51,11 @@ const reducer = handleActions(
                     errorNumber,
                     description,
                 };
+            });
+        },
+        [INITIALIZE_ERROR]: (state: State) => {
+            return produce(state, draft => {
+                draft.error = initialState.error;
             });
         },
     },

@@ -1,6 +1,7 @@
 import Memo from '../models/Memo';
 import User from '../models/User';
 import mongoose from 'mongoose';
+import joi from 'joi';
 import { generateToken, decodeToken } from 'lib/token';
 
 type FindByIdPayload = {
@@ -109,10 +110,47 @@ const resolvers = {
             }
         },
         createUser: async (_: any, { name, password }: CreateUserPayload) => {
+            // validate name, password
+            const schema = joi.object().keys({
+                name: joi
+                    .string()
+                    .required()
+                    .min(8)
+                    .max(20)
+                    .alphanum(),
+                password: joi
+                    .string()
+                    .required()
+                    .min(6)
+                    .max(30),
+            });
+
+            const result = joi.validate(
+                {
+                    name,
+                    password,
+                },
+                schema
+            );
+
+            if (result.error) {
+                return {
+                    _id: null,
+                    name: null,
+                    jwt: '',
+                    error: 400,
+                };
+            }
+
             try {
                 const existing = await (User as any).checkExisting(name);
                 if (existing) {
-                    return;
+                    return {
+                        _id: null,
+                        name: null,
+                        jwt: '',
+                        error: 409,
+                    };
                 }
 
                 const hashed = (User as any).hashPassword(password);
@@ -122,6 +160,7 @@ const resolvers = {
                 });
 
                 await user.save();
+
                 const token = await generateToken({
                     _id: user._id,
                     name: (user as any).name,
@@ -131,6 +170,7 @@ const resolvers = {
                     _id: user._id,
                     name: (user as any).name,
                     jwt: token,
+                    error: null,
                 };
             } catch (e) {
                 console.log(e);

@@ -19,6 +19,7 @@ const CREATE_USER = gql`
             _id
             name
             jwt
+            error
         }
     }
 `;
@@ -44,6 +45,9 @@ const AuthModalContainer = () => {
     );
     const username = useSelector(({ modal }: State) => modal.input.username);
     const password = useSelector(({ modal }: State) => modal.input.password);
+    const errorDescription = useSelector(
+        ({ auth }: State) => auth.error.description
+    );
 
     const ModalActions = bindActionCreators(modalActions, dispatch);
     const AuthActions = bindActionCreators(authActions, dispatch);
@@ -55,6 +59,7 @@ const AuthModalContainer = () => {
     const changeInput = ({ name, value }: NameValueType) =>
         ModalActions.changeInput({ name, value });
     const initializeInput = () => ModalActions.initializeInput();
+    const initializeError = () => AuthActions.initializeError();
     const setLogged = (isLoggedIn: boolean) =>
         AuthActions.setLogged(isLoggedIn);
     const setError = ({ errorNumber, description }: ErrorType) =>
@@ -86,6 +91,8 @@ const AuthModalContainer = () => {
                                 })
                             );
                             setLogged(true);
+                            initializeInput();
+                            initializeError();
                             hideModal({ name: 'login' });
                             return;
                         }
@@ -119,6 +126,8 @@ const AuthModalContainer = () => {
                                 password={password}
                                 onLogin={findUserByNameAndPassword}
                                 loading={loading}
+                                errorDescription={errorDescription}
+                                initializeError={initializeError}
                             />
                         );
                     }}
@@ -138,7 +147,23 @@ const AuthModalContainer = () => {
                     onCompleted={(registerPayload: any) => {
                         if (registerPayload) {
                             const { createUser } = registerPayload;
-                            const { jwt, name, _id } = createUser;
+                            const { jwt, name, _id, error } = createUser;
+                            if (error) {
+                                let description = '';
+                                if (error === 400) {
+                                    description =
+                                        '아이디는 8자이상 20자 미만의 알파벳과 숫자로만 가능합니다.\n 비밀번호는 6자이상 30자미만으로 가능합니다.';
+                                }
+                                if (error === 409) {
+                                    description =
+                                        '이미 존재하는 아이디 입니다.';
+                                }
+                                setError({
+                                    errorNumber: error,
+                                    description,
+                                });
+                                return;
+                            }
                             localStorage.setItem(
                                 'userInfo',
                                 JSON.stringify({
@@ -148,6 +173,8 @@ const AuthModalContainer = () => {
                                 })
                             );
                             setLogged(true);
+                            initializeInput();
+                            initializeError();
                             hideModal({ name: 'register' });
                         }
                     }}
@@ -167,6 +194,8 @@ const AuthModalContainer = () => {
                                 username={username}
                                 password={password}
                                 loading={loading}
+                                errorDescription={errorDescription}
+                                initializeError={initializeError}
                             />
                         );
                     }}

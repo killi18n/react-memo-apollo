@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import { Circle } from 'better-react-spinkit';
 import Button from 'components/common/Button';
 import { actions as modalActions } from 'store/modules/modal';
 
@@ -32,6 +33,7 @@ type Props = {
 };
 
 const Header = ({ ModalActions, logged, setLogged }: Props) => {
+    const [loading, setLoading] = useState(false);
     const showLoginModal = () => ModalActions.showModal({ name: 'login' });
     return (
         <HeaderWrapper>
@@ -44,16 +46,19 @@ const Header = ({ ModalActions, logged, setLogged }: Props) => {
                 ) : (
                     <Button
                         onClick={() => {
+                            if (loading) return;
+                            setLoading(true);
                             new Promise((resolve, reject) => {
                                 setTimeout(() => {
                                     localStorage.clear();
                                     setLogged(false);
+                                    setLoading(false);
                                     resolve();
                                 }, 3000);
                             });
                         }}
                     >
-                        LOG OUT
+                        {loading ? <Circle color="white" /> : 'LOGOUT'}
                     </Button>
                 )}
             </HeaderRight>

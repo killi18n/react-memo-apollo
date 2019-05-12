@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import { Circle } from 'better-react-spinkit';
 import Button from 'components/common/Button';
 import { ModalVisiblePayload } from 'store/modules/modal';
 import { NameValueType } from 'types/common';
@@ -42,6 +43,13 @@ const Input = styled.input`
 
 const Title = styled.h1``;
 
+const ErrorDescription = styled.p`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fa5252;
+`;
+
 type Props = {
     type: string;
     hideModal({ name }: ModalVisiblePayload): any;
@@ -53,6 +61,8 @@ type Props = {
     username: string;
     password: string;
     loading?: boolean;
+    errorDescription: string;
+    initializeError(): void;
 };
 
 const AuthModal = ({
@@ -66,10 +76,16 @@ const AuthModal = ({
     onRegister,
     onLogin,
     loading,
+    errorDescription,
+    initializeError,
 }: Props) => {
+    const [authenticationLoading, setAuthenticationLoading] = useState(false);
     return (
         <AuthForm>
             <Title>{type === 'login' ? 'LOGIN' : 'REGISTER'}</Title>
+            {errorDescription !== '' && (
+                <ErrorDescription>{errorDescription}</ErrorDescription>
+            )}
             <LabelWithInput>
                 <Label>Username</Label>
                 <InputWrapper>
@@ -109,11 +125,25 @@ const AuthModal = ({
                             alignItems: 'center',
                             justifyContent: 'center',
                         }}
-                        onClick={() =>
-                            onLogin({ variables: { name: username, password } })
-                        }
+                        onClick={() => {
+                            if (loading || authenticationLoading) return;
+                            setAuthenticationLoading(true);
+                            new Promise((resolve, reject) => {
+                                setTimeout(() => {
+                                    onLogin({
+                                        variables: { name: username, password },
+                                    });
+                                    setAuthenticationLoading(false);
+                                    resolve();
+                                }, 3000);
+                            });
+                        }}
                     >
-                        {loading ? 'LOADING...' : 'LOGIN'}
+                        {loading || authenticationLoading ? (
+                            <Circle color="white" />
+                        ) : (
+                            'LOGIN'
+                        )}
                     </Button>
                     <Button
                         style={{
@@ -127,6 +157,7 @@ const AuthModal = ({
                         }}
                         onClick={() => {
                             initializeInput();
+                            initializeError();
                             hideModal({ name: 'login' });
                             showModal({ name: 'register' });
                         }}
@@ -146,13 +177,25 @@ const AuthModal = ({
                             alignItems: 'center',
                             justifyContent: 'center',
                         }}
-                        onClick={() =>
-                            onRegister({
-                                variables: { name: username, password },
-                            })
-                        }
+                        onClick={() => {
+                            if (loading || authenticationLoading) return;
+                            setAuthenticationLoading(true);
+                            new Promise((resolve, reject) => {
+                                setTimeout(() => {
+                                    onRegister({
+                                        variables: { name: username, password },
+                                    });
+                                    setAuthenticationLoading(false);
+                                    resolve();
+                                }, 3000);
+                            });
+                        }}
                     >
-                        {loading ? 'LOADING...' : 'REGISTER'}
+                        {loading || authenticationLoading ? (
+                            <Circle color="white" />
+                        ) : (
+                            'REGISTER'
+                        )}
                     </Button>
                     <Button
                         style={{
@@ -166,6 +209,7 @@ const AuthModal = ({
                         }}
                         onClick={() => {
                             initializeInput();
+                            initializeError();
                             hideModal({ name: 'register' });
                             showModal({ name: 'login' });
                         }}
