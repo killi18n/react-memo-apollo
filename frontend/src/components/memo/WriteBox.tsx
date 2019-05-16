@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from 'components/common/Button';
+import { ChangeInputPayload } from 'store/modules/memo';
 
 const BoxWrapper = styled.div`
     display: flex;
@@ -36,10 +37,21 @@ const MemoTextArea = styled.textarea`
     height: 75px;
 `;
 
-const WriteBox = () => {
+type Props = {
+    handleChange(payload: ChangeInputPayload): void;
+    memoInput: string;
+};
+
+const WriteBox = ({ handleChange, memoInput }: Props) => {
     return (
         <BoxWrapper>
-            <MemoTextArea />
+            <MemoTextArea
+                name="memo"
+                onChange={(e: any) =>
+                    handleChange({ name: e.target.name, value: e.target.value })
+                }
+                value={memoInput}
+            />
             <Button
                 style={{
                     background: '#7048e8',
