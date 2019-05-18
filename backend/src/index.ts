@@ -1,18 +1,21 @@
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
+
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import { decodeToken } from 'lib/token';
+import { makeExecutableSchema } from 'graphql-tools';
 import typeDefs from './graphql/typeDefs';
 import resolvers from './graphql/resolvers';
+import { decodeToken } from 'lib/token';
 
 dotenv.config();
 
 const { MONGO_URI: mongoURI } = process.env;
 
+const schema = makeExecutableSchema({ typeDefs, resolvers });
+
 const server = new ApolloServer({
-    typeDefs,
-    resolvers,
+    schema,
     context: async ({ req }) => {
         try {
             const token = req.headers.authorization;
