@@ -40,8 +40,15 @@ const resolver = {
     Mutation: {
         createMemo: async (
             _: any,
-            { content, writer, createdAt }: CreateMemoPayload
+            { content, writer, createdAt }: CreateMemoPayload,
+            context: any
         ): Promise<any> => {
+            console.log('createMemo');
+            if (!context.decodedToken) {
+                console.log('no token!');
+                return;
+            }
+            console.log('decodedToken', context.decodedToken);
             try {
                 const memo = new Memo({
                     content,

@@ -40,9 +40,19 @@ const MemoTextArea = styled.textarea`
 type Props = {
     handleChange(payload: ChangeInputPayload): void;
     memoInput: string;
+    onCreate(payload: any): any;
 };
 
-const WriteBox = ({ handleChange, memoInput }: Props) => {
+const WriteBox = ({ handleChange, memoInput, onCreate }: Props) => {
+    const handleCreate = () => {
+        onCreate({
+            variables: {
+                content: memoInput,
+                writer: 'dongho',
+                createdAt: '2019-01-23',
+            },
+        });
+    };
     return (
         <BoxWrapper>
             <MemoTextArea
@@ -59,6 +69,7 @@ const WriteBox = ({ handleChange, memoInput }: Props) => {
                     marginLeft: 'auto',
                     marginTop: '1rem',
                 }}
+                onClick={handleCreate}
             >
                 작성하기
             </Button>
