@@ -23,6 +23,10 @@ const typeDefs = gql`
         createMemo(content: String!, createdAt: String!): CreateMemoReturn
         updateMemo(_id: ID!, content: String): Memo
     }
+
+    type Subscription {
+        memoCreated: Memo
+    }
 `;
 
 export default typeDefs;

@@ -1,7 +1,9 @@
-import Memo from 'models/Memo';
+import { PubSub } from 'apollo-server';
 import mongoose from 'mongoose';
-import joi from 'joi';
-import { generateToken, decodeToken } from 'lib/token';
+import Memo from 'models/Memo';
+
+const pubSub = new PubSub();
+const MEMO_CREATED = 'MEMO_CREATED';
 
 type FindByIdPayload = {
     _id: mongoose.Types.ObjectId;
@@ -31,6 +33,7 @@ const resolver = {
                     .skip((page - 1) * limit)
                     .limit(limit)
                     .lean()
+                    .sort({ _id: -1 })
                     .exec();
 
                 return memos;
@@ -69,6 +72,7 @@ const resolver = {
                     createdAt,
                 });
                 await memo.save();
+                pubSub.publish(MEMO_CREATED, { memoCreated: memo });
                 return {
                     memo,
                     error: null,
@@ -95,6 +99,11 @@ const resolver = {
             } catch (e) {
                 console.log(e);
             }
+        },
+    },
+    Subscription: {
+        memoCreated: {
+            subscribe: () => pubSub.asyncIterator([MEMO_CREATED]),
         },
     },
 };

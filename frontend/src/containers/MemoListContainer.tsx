@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Query, withApollo } from 'react-apollo';
+import { Query, withApollo, Subscription } from 'react-apollo';
 import gql from 'graphql-tag';
 import throttle from 'lodash/throttle';
 import MemoList from 'components/memo/MemoList';
@@ -15,6 +15,15 @@ const MEMOS = gql`
             writer
             createdAt
             updatedAt
+        }
+    }
+`;
+
+const MEMO_SUBSCRIPTION = gql`
+    subscription OnMemoCreated {
+        memoCreated {
+            _id
+            content
         }
     }
 `;
@@ -82,6 +91,12 @@ const MemoListContainer = ({ client }: Props) => {
 
                 return (
                     <MemoList>
+                        <Subscription subscription={MEMO_SUBSCRIPTION}>
+                            {({ data, loading, error }: GraphqlData) => {
+                                console.log(data);
+                                return <h4>hello</h4>;
+                            }}
+                        </Subscription>
                         {memos.map((memo: any) => (
                             <MemoCard
                                 key={memo._id}

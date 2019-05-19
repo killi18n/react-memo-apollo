@@ -1,5 +1,9 @@
 import express from 'express';
+import http from 'http';
+import { execute, subscribe } from 'graphql';
 import { ApolloServer } from 'apollo-server-express';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
+import { createServer } from 'http';
 
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
@@ -16,7 +20,21 @@ const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const server = new ApolloServer({
     schema,
-    context: async ({ req }) => {
+    context: async ({ req, connection }: any) => {
+        if (connection) {
+            const token = connection.context.headers['Authorization'];
+            if (!token || token === '') {
+                return {
+                    decodeToken: null,
+                };
+            }
+
+            const decoded = await decodeToken(token);
+
+            return {
+                decodedToken: decoded,
+            };
+        }
         try {
             const token = req.headers.authorization;
 
@@ -49,8 +67,16 @@ mongoose
 const app = express();
 server.applyMiddleware({ app });
 
+const httpServer = http.createServer(app);
+server.installSubscriptionHandlers(httpServer);
+
 // const router = express.Router();
 
-app.listen({ port: 4000 }, () =>
-    console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
-);
+httpServer.listen({ port: 4000 }, () => {
+    console.log(
+        `🚀 Server ready at http://localhost:4000${server.graphqlPath}`
+    );
+    console.log(
+        `🚀 Server ready at http://localhost:4000${server.subscriptionsPath}`
+    );
+});
