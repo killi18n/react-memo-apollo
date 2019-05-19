@@ -18,11 +18,21 @@ type UpdateMemoPayload = {
     content: string;
 };
 
+type GetMemosPayload = {
+    page: number;
+    limit: number;
+};
+
 const resolver = {
     Query: {
-        memos: async () => {
+        memos: async (_: any, { page, limit }: GetMemosPayload) => {
             try {
-                const memos = await Memo.find();
+                const memos = await Memo.find()
+                    .skip((page - 1) * limit)
+                    .limit(limit)
+                    .lean()
+                    .exec();
+
                 return memos;
             } catch (e) {
                 console.log(e);
@@ -40,7 +50,7 @@ const resolver = {
     Mutation: {
         createMemo: async (
             _: any,
-            { content, writer, createdAt }: CreateMemoPayload,
+            { content, createdAt }: CreateMemoPayload,
             context: any
         ): Promise<any> => {
             if (!context.decodedToken) {
@@ -50,10 +60,12 @@ const resolver = {
                 };
             }
 
+            const { name } = context.decodedToken;
+
             try {
                 const memo = new Memo({
                     content,
-                    writer,
+                    writer: name,
                     createdAt,
                 });
                 await memo.save();

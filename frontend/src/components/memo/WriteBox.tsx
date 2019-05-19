@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import dateFns from 'date-fns';
 import Button from 'components/common/Button';
 import { ChangeInputPayload } from 'store/modules/memo';
 
@@ -48,8 +49,7 @@ const WriteBox = ({ handleChange, memoInput, onCreate }: Props) => {
         onCreate({
             variables: {
                 content: memoInput,
-                writer: 'dongho',
-                createdAt: '2019-01-23',
+                createdAt: dateFns.format(new Date(), 'MM/DD/YYYY'),
             },
         });
     };

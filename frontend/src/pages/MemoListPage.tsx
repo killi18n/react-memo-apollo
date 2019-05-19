@@ -2,6 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import Structure from 'components/base/Structure';
 import WriteContainer from 'containers/WriteContainer';
+import MemoListContainer from 'containers/MemoListContainer';
 
 const MemoListPage = () => {
     return (
@@ -11,6 +12,7 @@ const MemoListPage = () => {
             </Helmet>
             <Structure>
                 <WriteContainer />
+                <MemoListContainer />
             </Structure>
         </>
     );

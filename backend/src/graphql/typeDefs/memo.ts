@@ -6,7 +6,7 @@ const typeDefs = gql`
         content: String!
         writer: String!
         createdAt: String!
-        updatedAt: String!
+        updatedAt: String
     }
 
     type CreateMemoReturn {
@@ -15,16 +15,12 @@ const typeDefs = gql`
     }
 
     type Query {
-        memos: [Memo]
+        memos(page: Int!, limit: Int!): [Memo]
         memo(_id: ID!): Memo!
     }
 
     type Mutation {
-        createMemo(
-            content: String!
-            writer: String!
-            createdAt: String!
-        ): CreateMemoReturn
+        createMemo(content: String!, createdAt: String!): CreateMemoReturn
         updateMemo(_id: ID!, content: String): Memo
     }
 `;

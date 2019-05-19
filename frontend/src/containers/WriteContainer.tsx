@@ -10,12 +10,8 @@ import WriteBox from 'components/memo/WriteBox';
 import { GraphqlData } from 'types/common';
 
 const CREATE_MEMO = gql`
-    mutation CreateMemo(
-        $content: String!
-        $writer: String!
-        $createdAt: String!
-    ) {
-        createMemo(content: $content, writer: $writer, createdAt: $createdAt) {
+    mutation CreateMemo($content: String!, $createdAt: String!) {
+        createMemo(content: $content, createdAt: $createdAt) {
             memo {
                 _id
                 writer
