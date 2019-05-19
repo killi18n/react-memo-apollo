@@ -43,12 +43,13 @@ const resolver = {
             { content, writer, createdAt }: CreateMemoPayload,
             context: any
         ): Promise<any> => {
-            console.log('createMemo');
             if (!context.decodedToken) {
-                console.log('no token!');
-                return;
+                return {
+                    memo: null,
+                    error: 401,
+                };
             }
-            console.log('decodedToken', context.decodedToken);
+
             try {
                 const memo = new Memo({
                     content,
@@ -56,7 +57,10 @@ const resolver = {
                     createdAt,
                 });
                 await memo.save();
-                return memo;
+                return {
+                    memo,
+                    error: null,
+                };
             } catch (e) {
                 console.log(e);
             }

@@ -2,6 +2,7 @@ import produce from 'immer';
 import { handleActions, createAction } from 'redux-actions';
 
 const CHANGE_INPUT = '@memo/CHANGE_INPUT';
+const INITIALIZE_INPUT = '@memo/INITIALIZE_INPUT';
 
 export type ChangeInputPayload = {
     name: string;
@@ -13,6 +14,7 @@ export const actions = {
         CHANGE_INPUT,
         (payload: ChangeInputPayload) => payload
     ),
+    initializeInput: createAction(INITIALIZE_INPUT),
 };
 
 export type State = {
@@ -37,6 +39,11 @@ const reducer = handleActions(
             return produce(state, draft => {
                 const { name, value } = action.payload;
                 (draft.input as any)[name] = value;
+            });
+        },
+        [INITIALIZE_INPUT]: (state: State) => {
+            return produce(state, draft => {
+                draft.input = initialState.input;
             });
         },
     },

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Mutation } from 'react-apollo';
 import gql from 'graphql-tag';
 import { actions as memoActions, ChangeInputPayload } from 'store/modules/memo';
+import { actions as modalActions } from 'store/modules/modal';
 import { State } from 'store/modules';
 import WriteBox from 'components/memo/WriteBox';
 import { GraphqlData } from 'types/common';
@@ -15,10 +16,13 @@ const CREATE_MEMO = gql`
         $createdAt: String!
     ) {
         createMemo(content: $content, writer: $writer, createdAt: $createdAt) {
-            _id
-            content
-            writer
-            createdAt
+            memo {
+                _id
+                writer
+                content
+                createdAt
+            }
+            error
         }
     }
 `;
@@ -27,8 +31,10 @@ const WriteContainer = () => {
     const dispatch = useDispatch();
 
     const MemoActions = bindActionCreators(memoActions, dispatch);
+    const ModalActions = bindActionCreators(modalActions, dispatch);
     const changeInput = (payload: ChangeInputPayload) =>
         MemoActions.changeInput(payload);
+    const initializeInput = () => MemoActions.initializeInput();
 
     const memoInput = useSelector(({ memo }: State) => memo.input.memo);
 
@@ -36,7 +42,12 @@ const WriteContainer = () => {
         <Mutation
             mutation={CREATE_MEMO}
             onCompleted={(createMemoPayload: any) => {
-                console.log(createMemoPayload);
+                const { error, memo } = createMemoPayload.createMemo;
+                if (error && !memo) {
+                    ModalActions.showModal({ name: 'login' });
+                    return;
+                }
+                initializeInput();
             }}
         >
             {(createMemo: any, { data, loading, error }: GraphqlData) => {

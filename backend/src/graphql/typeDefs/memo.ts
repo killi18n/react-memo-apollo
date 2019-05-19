@@ -9,13 +9,22 @@ const typeDefs = gql`
         updatedAt: String!
     }
 
+    type CreateMemoReturn {
+        memo: Memo
+        error: Int
+    }
+
     type Query {
         memos: [Memo]
         memo(_id: ID!): Memo!
     }
 
     type Mutation {
-        createMemo(content: String!, writer: String!, createdAt: String!): Memo
+        createMemo(
+            content: String!
+            writer: String!
+            createdAt: String!
+        ): CreateMemoReturn
         updateMemo(_id: ID!, content: String): Memo
     }
 `;
