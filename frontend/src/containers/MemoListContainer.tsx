@@ -4,7 +4,7 @@ import gql from 'graphql-tag';
 import throttle from 'lodash/throttle';
 import MemoList from 'components/memo/MemoList';
 import MemoCard from 'components/memo/MemoCard';
-import { GraphqlData } from 'types/common';
+import { GraphqlData, Memo } from 'types/common';
 import { getScrollBottom } from 'lib/common';
 
 const MEMOS = gql`
@@ -24,6 +24,9 @@ const MEMO_SUBSCRIPTION = gql`
         memoCreated {
             _id
             content
+            writer
+            createdAt
+            updatedAt
         }
     }
 `;
@@ -33,7 +36,7 @@ type Props = {
 };
 
 const MemoListContainer = ({ client }: Props) => {
-    const [memos, setMemos] = useState([]);
+    const [memos, setMemos] = useState([] as Memo[]);
     const [isLastPage, setLastPage] = useState(false);
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
@@ -83,31 +86,40 @@ const MemoListContainer = ({ client }: Props) => {
                     setLastPage(true);
                     return;
                 }
-                setMemos(memos.concat(memosPayload.memos));
+
+                setMemos([...memos, ...memosPayload.memos]);
             }}
         >
-            {({ data, error, loading }: GraphqlData) => {
-                if (memos.length === 0) return null;
-
+            {({ subscribeToMore, data, error, loading }: GraphqlData) => {
+                // if (loading) return null;
                 return (
-                    <MemoList>
-                        <Subscription subscription={MEMO_SUBSCRIPTION}>
-                            {({ data, loading, error }: GraphqlData) => {
-                                console.log(data);
-                                return <h4>hello</h4>;
+                    <>
+                        <MemoList
+                            memos={memos}
+                            subscribeToMore={() => {
+                                subscribeToMore({
+                                    document: MEMO_SUBSCRIPTION,
+                                    variables: {},
+                                    updateQuery: (
+                                        prev: any,
+                                        { subscriptionData }: any
+                                    ) => {
+                                        setMemos([
+                                            subscriptionData.data.memoCreated,
+                                            ...prev.memos,
+                                        ]);
+                                        // return Object.assign({}, prev, {
+                                        //     memos: [
+                                        //         subscriptionData.data
+                                        //             .memoCreated,
+                                        //         ...prev.memos,
+                                        //     ],
+                                        // });
+                                    },
+                                });
                             }}
-                        </Subscription>
-                        {memos.map((memo: any) => (
-                            <MemoCard
-                                key={memo._id}
-                                _id={memo._id}
-                                content={memo.content}
-                                writer={memo.writer}
-                                createdAt={memo.createdAt}
-                                updatedAt={memo.updatedAt}
-                            />
-                        ))}
-                    </MemoList>
+                        />
+                    </>
                 );
             }}
         </Query>

@@ -1,5 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Memo } from 'types/common';
+import MemoCard from './MemoCard';
 
 const ListWrapper = styled.div`
     margin-top: 1rem;
@@ -7,11 +9,31 @@ const ListWrapper = styled.div`
 `;
 
 type Props = {
-    children: any;
+    memos: Memo[];
+    subscribeToMore(): void;
 };
 
-const MemoList = ({ children }: Props) => {
-    return <ListWrapper>{children}</ListWrapper>;
-};
+class MemoList extends React.Component<Props> {
+    componentDidMount() {
+        this.props.subscribeToMore();
+    }
+    render() {
+        const { memos } = this.props;
+        return (
+            <ListWrapper>
+                {memos.map((memo: any) => (
+                    <MemoCard
+                        key={memo._id}
+                        _id={memo._id}
+                        content={memo.content}
+                        writer={memo.writer}
+                        createdAt={memo.createdAt}
+                        updatedAt={memo.updatedAt}
+                    />
+                ))}
+            </ListWrapper>
+        );
+    }
+}
 
 export default MemoList;

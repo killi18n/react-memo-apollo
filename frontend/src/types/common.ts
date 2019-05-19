@@ -4,3 +4,10 @@ export type NameValueType = {
     value: string;
 };
 export type GraphqlData = any;
+export type Memo = {
+    _id: string;
+    content: string;
+    writer: string;
+    createdAt: string;
+    updatedAt: string;
+};

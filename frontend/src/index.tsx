@@ -21,7 +21,6 @@ const rootElement = document.getElementById('root');
 const userInfoStorage = localStorage.getItem('userInfo');
 
 const authLink = setContext((_, { headers }) => {
-    // const userInfoStorage = localStorage.getItem('userInfo');
     if (!userInfoStorage) {
         return {
             headers: {
