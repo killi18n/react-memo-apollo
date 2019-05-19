@@ -72,7 +72,16 @@ const resolver = {
                     createdAt,
                 });
                 await memo.save();
-                pubSub.publish(MEMO_CREATED, { memoCreated: memo });
+                pubSub.publish(MEMO_CREATED, {
+                    memoCreated: {
+                        _id: memo._id,
+                        content: (memo as any).content,
+                        writer: (memo as any).writer,
+                        updatedAt: (memo as any).updatedAt,
+                        createdAt: (memo as any).createdAt,
+                        isSubscribed: true,
+                    },
+                });
                 return {
                     memo,
                     error: null,

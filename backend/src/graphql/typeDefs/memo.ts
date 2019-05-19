@@ -7,6 +7,7 @@ const typeDefs = gql`
         writer: String!
         createdAt: String!
         updatedAt: String
+        isSubscribed: Boolean
     }
 
     type CreateMemoReturn {

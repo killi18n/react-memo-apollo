@@ -10,4 +10,5 @@ export type Memo = {
     writer: string;
     createdAt: string;
     updatedAt: string;
+    isSubscribed?: boolean;
 };

@@ -27,6 +27,7 @@ const MEMO_SUBSCRIPTION = gql`
             writer
             createdAt
             updatedAt
+            isSubscribed
         }
     }
 `;
@@ -87,15 +88,16 @@ const MemoListContainer = ({ client }: Props) => {
                     return;
                 }
 
-                setMemos([...memos, ...memosPayload.memos]);
+                // setMemos([...memos, ...memosPayload.memos]);
             }}
         >
             {({ subscribeToMore, data, error, loading }: GraphqlData) => {
+                // console.log(loading);
                 // if (loading) return null;
                 return (
                     <>
                         <MemoList
-                            memos={memos}
+                            memos={data.memos}
                             subscribeToMore={() => {
                                 subscribeToMore({
                                     document: MEMO_SUBSCRIPTION,
@@ -104,17 +106,27 @@ const MemoListContainer = ({ client }: Props) => {
                                         prev: any,
                                         { subscriptionData }: any
                                     ) => {
-                                        setMemos([
-                                            subscriptionData.data.memoCreated,
-                                            ...prev.memos,
-                                        ]);
-                                        // return Object.assign({}, prev, {
-                                        //     memos: [
-                                        //         subscriptionData.data
-                                        //             .memoCreated,
-                                        //         ...prev.memos,
-                                        //     ],
-                                        // });
+                                        // setMemos([
+                                        //     subscriptionData.data.memoCreated,
+                                        //     ...prev.memos,
+                                        // ]);
+                                        // return {
+                                        //     ...prev,
+                                        //     memos:
+                                        // }
+                                        return {
+                                            memos: [
+                                                {
+                                                    _id: '1234',
+                                                    content: '1234',
+                                                    writer: '1234',
+                                                    updatedAt: '1234',
+                                                    createdAt: '1234',
+                                                    isSubscribed: true,
+                                                    __typename: 'Memo',
+                                                },
+                                            ],
+                                        };
                                     },
                                 });
                             }}

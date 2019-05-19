@@ -13,12 +13,46 @@ type Props = {
     subscribeToMore(): void;
 };
 
-class MemoList extends React.Component<Props> {
+type State = {
+    memos: Memo[];
+};
+
+class MemoList extends React.Component<Props, State> {
+    state = {
+        memos: [],
+    };
     componentDidMount() {
         this.props.subscribeToMore();
     }
+    componentDidUpdate(prevProps: Props) {
+        if (prevProps.memos !== this.props.memos) {
+            console.log(this.props.memos[0]);
+            if (
+                this.props.memos.length === 1 &&
+                this.props.memos[0].isSubscribed
+            ) {
+                this.setState({
+                    ...this.state,
+                    memos: [this.props.memos[0], ...this.state.memos],
+                });
+                return;
+            }
+            if (this.state.memos.length > 0) {
+                this.setState({
+                    ...this.state,
+                    memos: [...this.state.memos, ...this.props.memos],
+                });
+                return;
+            }
+            this.setState({
+                ...this.state,
+                memos: this.props.memos,
+            });
+        }
+    }
+
     render() {
-        const { memos } = this.props;
+        const { memos } = this.state;
         return (
             <ListWrapper>
                 {memos.map((memo: any) => (
