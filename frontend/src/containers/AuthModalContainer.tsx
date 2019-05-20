@@ -1,17 +1,18 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import ModalWrapper from 'components/common/ModalWrapper';
-import AuthModal from 'components/modal/AuthModal';
-import { State } from 'store/modules';
+
 import { bindActionCreators } from 'redux';
 import gql from 'graphql-tag';
 import { Mutation } from 'react-apollo';
 import {
     actions as modalActions,
     ModalVisiblePayload,
-} from 'store/modules/modal';
-import { NameValueType, GraphqlData } from 'types/common';
-import { authActions, ErrorType } from 'store/modules/auth';
+} from '../store/modules/modal';
+import ModalWrapper from '../components/common/ModalWrapper';
+import AuthModal from '../components/modal/AuthModal';
+import { State } from '../store/modules';
+import { NameValueType, GraphqlData } from '../types/common';
+import { authActions, ErrorType } from '../store/modules/auth';
 
 const CREATE_USER = gql`
     mutation CreateUser($name: String!, $password: String!) {

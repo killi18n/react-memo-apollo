@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Children } from 'types/common';
+import { Children } from '../../types/common';
 
 type Props = {
     children: Children;

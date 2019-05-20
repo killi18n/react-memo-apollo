@@ -14,8 +14,9 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 import { WebSocketLink } from 'apollo-link-ws';
 import { split } from 'apollo-link';
 import { getMainDefinition } from 'apollo-utilities';
-import App from 'components/App';
-import Html from 'Html';
+import nodeFetch from 'node-fetch';
+import App from './components/App';
+import Html from './Html';
 
 const app = express();
 
@@ -40,28 +41,31 @@ const authLink = setContext((_, { headers }) => {
 
 const httpLink = new HttpLink({
     uri: 'http://localhost:4000/graphql',
+    fetch: nodeFetch,
 });
 
-const wsLink = new WebSocketLink({
-    uri: 'ws://localhost:4000/graphql',
-    onDisconnected: () => {
-        console.log('not connected');
-    },
-    options: {
-        lazy: true,
-        reconnect: true,
-        connectionParams: () => {
-            const checkStorage = localStorage.getItem('userInfo');
-            return {
-                headers: {
-                    Authorization: checkStorage
-                        ? JSON.parse(checkStorage).jwt
-                        : '',
-                },
-            };
-        },
-    },
-});
+const wsLink = process.browser
+    ? new WebSocketLink({
+          uri: 'ws://localhost:4000/graphql',
+          onDisconnected: () => {
+              console.log('not connected');
+          },
+          options: {
+              lazy: true,
+              reconnect: true,
+              connectionParams: () => {
+                  const checkStorage = localStorage.getItem('userInfo');
+                  return {
+                      headers: {
+                          Authorization: checkStorage
+                              ? JSON.parse(checkStorage).jwt
+                              : '',
+                      },
+                  };
+              },
+          },
+      })
+    : null;
 
 const link = split(
     // split based on operation type

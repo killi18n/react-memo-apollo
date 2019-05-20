@@ -1,6 +1,6 @@
 import produce from 'immer';
 import { handleActions, createAction } from 'redux-actions';
-import { Memo } from 'types/common';
+import { Memo } from '../../types/common';
 
 const CHANGE_INPUT = '@memo/CHANGE_INPUT';
 const INITIALIZE_INPUT = '@memo/INITIALIZE_INPUT';

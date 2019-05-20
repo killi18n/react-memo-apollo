@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { Circle } from 'better-react-spinkit';
-import Button from 'components/common/Button';
-import { actions as modalActions } from 'store/modules/modal';
+import Button from '../common/Button';
+import { actions as modalActions } from '../../store/modules/modal';
 
 const HeaderWrapper = styled.div`
     background: #7048e8;

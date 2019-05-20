@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Circle } from 'better-react-spinkit';
-import Button from 'components/common/Button';
-import { ModalVisiblePayload } from 'store/modules/modal';
-import { NameValueType } from 'types/common';
+import Button from '../common/Button';
+import { ModalVisiblePayload } from '../../store/modules/modal';
+import { NameValueType } from '../../types/common';
 
 const AuthForm = styled.div`
     background: #ffffff;

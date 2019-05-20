@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
-import NotFound from 'components/common/NotFound';
+import NotFound from '../components/common/NotFound';
 
 const NotFoundPage = () => {
     return (

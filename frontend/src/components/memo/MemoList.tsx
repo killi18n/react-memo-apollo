@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Memo } from 'types/common';
+import { Memo } from '../../types/common';
 import MemoCard from './MemoCard';
 
 const ListWrapper = styled.div`

@@ -1,6 +1,6 @@
 import { handleActions, createAction } from 'redux-actions';
 import produce from 'immer';
-import { NameValueType } from 'types/common';
+import { NameValueType } from '../../types/common';
 
 const SHOW_MODAL = '@modal/SHOW_MODAL';
 const HIDE_MODAL = '@modal/HIDE_MODAL';

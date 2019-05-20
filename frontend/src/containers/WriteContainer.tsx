@@ -3,11 +3,14 @@ import { bindActionCreators } from 'redux';
 import { useDispatch, useSelector } from 'react-redux';
 import { Mutation } from 'react-apollo';
 import gql from 'graphql-tag';
-import { actions as memoActions, ChangeInputPayload } from 'store/modules/memo';
-import { actions as modalActions } from 'store/modules/modal';
-import { State } from 'store/modules';
-import WriteBox from 'components/memo/WriteBox';
-import { GraphqlData } from 'types/common';
+import {
+    actions as memoActions,
+    ChangeInputPayload,
+} from '../store/modules/memo';
+import { actions as modalActions } from '../store/modules/modal';
+import { State } from '../store/modules';
+import WriteBox from '../components/memo/WriteBox';
+import { GraphqlData } from '../types/common';
 
 const CREATE_MEMO = gql`
     mutation CreateMemo($content: String!, $createdAt: String!) {

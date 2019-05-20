@@ -1,8 +1,8 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
-import Structure from 'components/base/Structure';
-import WriteContainer from 'containers/WriteContainer';
-import MemoListContainer from 'containers/MemoListContainer';
+import Structure from '../components/base/Structure';
+import WriteContainer from '../containers/WriteContainer';
+import MemoListContainer from '../containers/MemoListContainer';
 
 const MemoListPage = () => {
     return (

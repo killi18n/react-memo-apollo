@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import dateFns from 'date-fns';
-import Button from 'components/common/Button';
-import { ChangeInputPayload } from 'store/modules/memo';
+import Button from '../common/Button';
+import { ChangeInputPayload } from '../../store/modules/memo';
 
 const BoxWrapper = styled.div`
     display: flex;

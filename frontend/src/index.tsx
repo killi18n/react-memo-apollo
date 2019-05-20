@@ -10,8 +10,8 @@ import { ApolloProvider } from 'react-apollo';
 import { WebSocketLink } from 'apollo-link-ws';
 import { split } from 'apollo-link';
 import { getMainDefinition } from 'apollo-utilities';
-import App from 'components/App';
-import configure from 'store/configure';
+import App from './components/App';
+import configure from './store/configure';
 import 'index.css';
 import * as serviceWorker from './serviceWorker';
 

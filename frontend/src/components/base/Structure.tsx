@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Children } from 'types/common';
-import HeaderContainer from 'containers/HeaderContainer';
+import { Children } from '../../types/common';
+import HeaderContainer from '../../containers/HeaderContainer';
 
 type Props = {
     children: Children;

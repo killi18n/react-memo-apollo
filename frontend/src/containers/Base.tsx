@@ -3,8 +3,8 @@ import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 import { useDispatch } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { GraphqlData } from 'types/common';
-import { authActions } from 'store/modules/auth';
+import { GraphqlData } from '../types/common';
+import { authActions } from '../store/modules/auth';
 
 const CHECK_USER_LOGGED_IN = gql`
     query CheckUserLoggedIn($token: String!) {

@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Query, withApollo } from 'react-apollo';
 import gql from 'graphql-tag';
 import throttle from 'lodash/throttle';
-import MemoList from 'components/memo/MemoList';
-import { GraphqlData } from 'types/common';
-import { getScrollBottom } from 'lib/common';
 import { bindActionCreators } from 'redux';
 import { actions as memoActions } from '../store/modules/memo';
-import { State } from 'store/modules';
+import MemoList from '../components/memo/MemoList';
+import { GraphqlData } from '../types/common';
+import { getScrollBottom } from '../lib/common';
+import { State } from '../store/modules';
 
 const MEMOS = gql`
     query Memos($limit: Int!, $cursor: String) {
