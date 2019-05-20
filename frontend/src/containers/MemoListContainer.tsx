@@ -1,19 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Query, withApollo, Subscription } from 'react-apollo';
+import { Query, withApollo } from 'react-apollo';
 import gql from 'graphql-tag';
 import throttle from 'lodash/throttle';
 import MemoList from 'components/memo/MemoList';
-import MemoCard from 'components/memo/MemoCard';
-import { GraphqlData, Memo } from 'types/common';
+import { GraphqlData } from 'types/common';
 import { getScrollBottom } from 'lib/common';
 import { bindActionCreators } from 'redux';
 import { actions as memoActions } from '../store/modules/memo';
 import { State } from 'store/modules';
 
 const MEMOS = gql`
-    query Memos($page: Int!, $limit: Int!) {
-        memos(page: $page, limit: $limit) {
+    query Memos($limit: Int!, $cursor: String) {
+        memos(limit: $limit, cursor: $cursor) {
             memos {
                 _id
                 content
@@ -34,7 +33,6 @@ const MEMO_SUBSCRIPTION = gql`
             writer
             createdAt
             updatedAt
-            isSubscribed
         }
     }
 `;
@@ -52,20 +50,16 @@ const MemoListContainer = ({ client }: Props) => {
     const isLastPage = useSelector((state: State) => state.memo.isLastPage);
     const limit = useSelector((state: State) => state.memo.limit);
 
-    // const [memos, setMemos] = useState([] as Memo[]);
-    // const [isLastPage, setLastPage] = useState(false);
-    // const [page, setPage] = useState(1);
-    // const [limit, setLimit] = useState(10);
-
-    const onScroll = throttle(() => {
+    const onScroll = throttle(async () => {
         if (isLastPage) return;
         const scrollBottom = getScrollBottom();
         if (scrollBottom > 100 || isLastPage) return;
         MemoActions.setPage({ page: page + 1 });
-        client.query({
+
+        const result = await client.query({
             query: gql`
-                query Memos($page: Int!, $limit: Int!) {
-                    memos(page: $page, limit: $limit) {
+                query Memos($limit: Int!, $cursor: String!) {
+                    memos(limit: $limit, cursor: $cursor) {
                         memos {
                             _id
                             content
@@ -77,9 +71,14 @@ const MemoListContainer = ({ client }: Props) => {
                     }
                 }
             `,
-            variables: { page, limit },
+            variables: { limit, cursor: memos[memos.length - 1]._id },
         });
-    }, 100);
+        const { memos: resultMemos } = result.data.memos;
+
+        MemoActions.setMemos({
+            memos: resultMemos,
+        });
+    }, 1000);
 
     const listenScroll = () => {
         window.addEventListener('scroll', onScroll);
@@ -100,15 +99,12 @@ const MemoListContainer = ({ client }: Props) => {
     return (
         <Query
             query={MEMOS}
-            variables={{ page, limit }}
+            variables={{
+                limit: 10,
+                cursor: undefined,
+            }}
             onCompleted={(memosPayload: any) => {
-                const { memos, lastPage } = memosPayload.memos;
-                if (memosPayload.memos.length === 0) {
-                    MemoActions.setIsLastPage({
-                        isLastPage: page === lastPage,
-                    });
-                    return;
-                }
+                const { memos } = memosPayload.memos;
 
                 MemoActions.setMemos({
                     memos,
@@ -116,8 +112,6 @@ const MemoListContainer = ({ client }: Props) => {
             }}
         >
             {({ subscribeToMore, data, error, loading }: GraphqlData) => {
-                // console.log(loading);
-                // if (loading) return null;
                 return (
                     <>
                         <MemoList
@@ -126,7 +120,6 @@ const MemoListContainer = ({ client }: Props) => {
                                 subscribeToMore({
                                     document: MEMO_SUBSCRIPTION,
                                     onError: (err: any) => {
-                                        console.log('err', err);
                                         if (err.message === 'not logged in') {
                                             localStorage.clear();
                                             window.location.reload();
@@ -136,15 +129,11 @@ const MemoListContainer = ({ client }: Props) => {
                                         prev: any,
                                         { subscriptionData }: any
                                     ) => {
-                                        console.log(subscriptionData);
                                         MemoActions.setNewMemo({
                                             memo:
                                                 subscriptionData.data
                                                     .memoCreated,
                                         });
-                                        return {
-                                            memos,
-                                        };
                                     },
                                 });
                             }}

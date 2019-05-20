@@ -1,5 +1,5 @@
 import { PubSub } from 'apollo-server';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import Memo from 'models/Memo';
 
 const pubSub = new PubSub();
@@ -21,24 +21,30 @@ type UpdateMemoPayload = {
 };
 
 type GetMemosPayload = {
-    page: number;
     limit: number;
+    cursor?: string;
 };
 
 const resolver = {
     Query: {
-        memos: async (_: any, { page, limit }: GetMemosPayload) => {
+        memos: async (_: any, { limit, cursor }: GetMemosPayload) => {
+            let query = {};
+            if (cursor && !Types.ObjectId(cursor)) {
+                return {
+                    memos: [],
+                    lastPage: 0,
+                };
+            }
             try {
-                const memos = await Memo.find()
-                    .skip((page - 1) * limit)
-                    .limit(limit)
-                    .lean()
+                if (cursor) {
+                    (query as any)._id = { $lt: cursor };
+                }
+                const memos = await Memo.find(query)
                     .sort({ _id: -1 })
-                    .exec();
-
+                    .limit(limit);
                 const count = await Memo.count({}).exec();
                 const lastPage = Math.ceil(count / limit);
-
+                console.log(memos);
                 return {
                     memos,
                     lastPage,
@@ -62,7 +68,6 @@ const resolver = {
             { content, createdAt }: CreateMemoPayload,
             context: any
         ): Promise<any> => {
-            console.log(context.decodedToken);
             if (!context.decodedToken) {
                 return {
                     memo: null,
@@ -86,7 +91,6 @@ const resolver = {
                         writer: (memo as any).writer,
                         updatedAt: (memo as any).updatedAt,
                         createdAt: (memo as any).createdAt,
-                        isSubscribed: true,
                     },
                 });
                 return {

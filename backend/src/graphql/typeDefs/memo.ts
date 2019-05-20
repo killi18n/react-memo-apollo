@@ -7,7 +7,6 @@ const typeDefs = gql`
         writer: String!
         createdAt: String!
         updatedAt: String
-        isSubscribed: Boolean
     }
 
     type CreateMemoReturn {
@@ -21,7 +20,7 @@ const typeDefs = gql`
     }
 
     type Query {
-        memos(page: Int!, limit: Int!): GetMemosReturn
+        memos(limit: Int!, cursor: String): GetMemosReturn
         memo(_id: ID!): Memo!
     }
 
