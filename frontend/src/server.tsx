@@ -1,23 +1,23 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { BrowserRouter } from 'react-router-dom';
-import { Provider } from 'react-redux';
+import ReactDOM from 'react-dom/server';
+import {
+    ApolloProvider,
+    getDataFromTree,
+    renderToStringWithData,
+} from 'react-apollo';
 import { ApolloClient } from 'apollo-client';
 import { HttpLink } from 'apollo-link-http';
-import { InMemoryCache } from 'apollo-cache-inmemory';
+import express from 'express';
+import { StaticRouter } from 'react-router';
 import { setContext } from 'apollo-link-context';
-import { ApolloProvider } from 'react-apollo';
+import { InMemoryCache } from 'apollo-cache-inmemory';
 import { WebSocketLink } from 'apollo-link-ws';
 import { split } from 'apollo-link';
 import { getMainDefinition } from 'apollo-utilities';
 import App from 'components/App';
-import configure from 'store/configure';
-import 'index.css';
-import * as serviceWorker from './serviceWorker';
+import Html from 'Html';
 
-const rootElement = document.getElementById('root');
-
-// const userInfoStorage = localStorage.getItem('userInfo');
+const app = express();
 
 const authLink = setContext((_, { headers }) => {
     if (!localStorage.getItem('userInfo')) {
@@ -78,27 +78,44 @@ const link = split(
 
 const cache = new InMemoryCache();
 
-const client = new ApolloClient({
-    link,
-    cache,
-});
+app.use((req, res) => {
+    const client = new ApolloClient({
+        ssrMode: true,
+        link,
+        cache,
+    });
 
-const store = configure();
+    const context = {};
 
-if (rootElement) {
-    const Root = () => (
+    const component = (
         <ApolloProvider client={client}>
-            <Provider store={store}>
-                <BrowserRouter>
-                    <App />
-                </BrowserRouter>
-            </Provider>
+            <StaticRouter location={req.url} context={context}>
+                <App />
+            </StaticRouter>
         </ApolloProvider>
     );
-    ReactDOM.render(<Root />, document.getElementById('root'));
-}
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+    renderToStringWithData(component)
+        .then((content: any) => {
+            const html = <Html content={content} client={client} />;
+            res.send(`<!DOCTYPE html>\n${ReactDOM.renderToString(html)}`);
+            res.status(200);
+            res.end();
+        })
+        .catch((e: any) => {
+            console.error('RENDERING ERROR:', e); // eslint-disable-line no-console
+            res.status(500);
+            res.end(
+                `An error occurred. Please submit an issue to [https://github.com/apollographql/GitHunt-React] with the following stack trace:\n\n${
+                    e.stack
+                }`
+            );
+        });
+});
+
+app.listen(5000, () =>
+    console.log(
+        // eslint-disable-line no-console
+        `app Server is now running on http://localhost:${5000}`
+    )
+);

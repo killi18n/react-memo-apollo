@@ -1,13 +1,11 @@
 import express from 'express';
 import http from 'http';
-import { execute, subscribe } from 'graphql';
 import { ApolloServer } from 'apollo-server-express';
-import { SubscriptionServer } from 'subscriptions-transport-ws';
-import { createServer } from 'http';
-
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { makeExecutableSchema } from 'graphql-tools';
+import fs from 'fs';
+import path from 'path';
 import typeDefs from './graphql/typeDefs';
 import resolvers from './graphql/resolvers';
 import { decodeToken } from 'lib/token';
@@ -15,6 +13,8 @@ import { decodeToken } from 'lib/token';
 dotenv.config();
 
 const { MONGO_URI: mongoURI } = process.env;
+
+const buildPath = path.resolve('../frontend/build');
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
@@ -50,9 +50,6 @@ const server = new ApolloServer({
             };
         } catch (e) {
             console.log(e);
-            // return {
-            //     decodedToken: null,
-            // };
             throw new Error('not logged in');
         }
     },
@@ -68,12 +65,11 @@ mongoose
     });
 
 const app = express();
+app.use(express.static(buildPath));
 server.applyMiddleware({ app });
 
 const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
-
-// const router = express.Router();
 
 httpServer.listen({ port: 4000 }, () => {
     console.log(
