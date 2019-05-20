@@ -21,21 +21,21 @@ const schema = makeExecutableSchema({ typeDefs, resolvers });
 const server = new ApolloServer({
     schema,
     context: async ({ req, connection }: any) => {
-        if (connection) {
-            const token = connection.context.headers['Authorization'];
-            if (!token || token === '') {
+        try {
+            if (connection) {
+                const token = connection.context.headers['Authorization'];
+                if (!token || token === '') {
+                    return {
+                        decodeToken: null,
+                    };
+                }
+
+                const decoded = await decodeToken(token);
+
                 return {
-                    decodeToken: null,
+                    decodedToken: decoded,
                 };
             }
-
-            const decoded = await decodeToken(token);
-
-            return {
-                decodedToken: decoded,
-            };
-        }
-        try {
             const token = req.headers.authorization;
 
             if (!token) {
@@ -50,6 +50,9 @@ const server = new ApolloServer({
             };
         } catch (e) {
             console.log(e);
+            // return {
+            //     decodedToken: null,
+            // };
             throw new Error('not logged in');
         }
     },

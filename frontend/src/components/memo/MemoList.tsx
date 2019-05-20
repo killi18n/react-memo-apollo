@@ -10,49 +10,17 @@ const ListWrapper = styled.div`
 
 type Props = {
     memos: Memo[];
-    subscribeToMore(): void;
+    subscribeToMore?(): void;
 };
 
-type State = {
-    memos: Memo[];
-};
-
-class MemoList extends React.Component<Props, State> {
-    state = {
-        memos: [],
-    };
+class MemoList extends React.Component<Props> {
     componentDidMount() {
-        this.props.subscribeToMore();
-    }
-    componentDidUpdate(prevProps: Props) {
-        if (prevProps.memos !== this.props.memos) {
-            console.log(this.props.memos[0]);
-            if (
-                this.props.memos.length === 1 &&
-                this.props.memos[0].isSubscribed
-            ) {
-                this.setState({
-                    ...this.state,
-                    memos: [this.props.memos[0], ...this.state.memos],
-                });
-                return;
-            }
-            if (this.state.memos.length > 0) {
-                this.setState({
-                    ...this.state,
-                    memos: [...this.state.memos, ...this.props.memos],
-                });
-                return;
-            }
-            this.setState({
-                ...this.state,
-                memos: this.props.memos,
-            });
+        if (this.props.subscribeToMore) {
+            this.props.subscribeToMore();
         }
     }
-
     render() {
-        const { memos } = this.state;
+        const { memos } = this.props;
         return (
             <ListWrapper>
                 {memos.map((memo: any) => (

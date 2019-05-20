@@ -18,10 +18,10 @@ import * as serviceWorker from './serviceWorker';
 
 const rootElement = document.getElementById('root');
 
-const userInfoStorage = localStorage.getItem('userInfo');
+// const userInfoStorage = localStorage.getItem('userInfo');
 
 const authLink = setContext((_, { headers }) => {
-    if (!userInfoStorage) {
+    if (!localStorage.getItem('userInfo')) {
         return {
             headers: {
                 ...headers,
@@ -29,7 +29,8 @@ const authLink = setContext((_, { headers }) => {
             },
         };
     }
-    const token = JSON.parse(userInfoStorage).jwt;
+    const checkStorage = localStorage.getItem('userInfo');
+    const token = checkStorage ? JSON.parse(checkStorage).jwt : '';
     return {
         headers: {
             ...headers,
@@ -44,14 +45,18 @@ const httpLink = new HttpLink({
 
 const wsLink = new WebSocketLink({
     uri: 'ws://localhost:4000/graphql',
+    onDisconnected: () => {
+        console.log('not connected');
+    },
     options: {
         lazy: true,
         reconnect: true,
         connectionParams: () => {
+            const checkStorage = localStorage.getItem('userInfo');
             return {
                 headers: {
-                    Authorization: userInfoStorage
-                        ? JSON.parse(userInfoStorage).jwt
+                    Authorization: checkStorage
+                        ? JSON.parse(checkStorage).jwt
                         : '',
                 },
             };

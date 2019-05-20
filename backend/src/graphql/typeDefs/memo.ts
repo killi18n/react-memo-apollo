@@ -15,8 +15,13 @@ const typeDefs = gql`
         error: Int
     }
 
+    type GetMemosReturn {
+        memos: [Memo]
+        lastPage: Int
+    }
+
     type Query {
-        memos(page: Int!, limit: Int!): [Memo]
+        memos(page: Int!, limit: Int!): GetMemosReturn
         memo(_id: ID!): Memo!
     }
 

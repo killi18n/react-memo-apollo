@@ -36,7 +36,13 @@ const resolver = {
                     .sort({ _id: -1 })
                     .exec();
 
-                return memos;
+                const count = await Memo.count({}).exec();
+                const lastPage = Math.ceil(count / limit);
+
+                return {
+                    memos,
+                    lastPage,
+                };
             } catch (e) {
                 console.log(e);
             }
@@ -56,6 +62,7 @@ const resolver = {
             { content, createdAt }: CreateMemoPayload,
             context: any
         ): Promise<any> => {
+            console.log(context.decodedToken);
             if (!context.decodedToken) {
                 return {
                     memo: null,
