@@ -5,7 +5,7 @@ import { ApolloProvider, getDataFromTree } from 'react-apollo';
 import { ApolloClient } from 'apollo-client';
 import { HttpLink } from 'apollo-link-http';
 import express, { Request, Response } from 'express';
-import { StaticRouter } from 'react-router';
+import { StaticRouter, matchPath } from 'react-router';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { setContext } from 'apollo-link-context';
 import { WebSocketLink } from 'apollo-link-ws';
@@ -15,11 +15,13 @@ import fetch from 'node-fetch';
 import { Provider } from 'react-redux';
 import { ServerStyleSheet } from 'styled-components';
 import path from 'path';
+import { Helmet } from 'react-helmet';
 
 import App from './components/App';
 import { renderToString } from 'react-dom/server';
 // import Html from 'Html';
 import configure from './store/configure';
+import routeConfig from 'lib/routeConfig';
 
 const manifestJson = require('../build/asset-manifest.json');
 
@@ -129,6 +131,8 @@ app.use((req: Request, res: Response) => {
         </ApolloProvider>
     );
 
+    const helmet = Helmet.renderStatic();
+
     // rendering code (see below)
 
     getDataFromTree(component).then(() => {
@@ -155,13 +159,28 @@ app.use((req: Request, res: Response) => {
             })
             .join('\n\t\t');
 
-        res.status(200);
+        let matched = false;
+
+        routeConfig.forEach(route => {
+            if (matchPath(req.path, route)) {
+                matched = true;
+            }
+        });
+
+        if (!matched) {
+            res.status(404);
+        } else {
+            res.status(200);
+        }
+
         res.send(
             `
                 <!DOCTYPE html>
                 <html>
                     ${styleTags}
                     ${cssKeys}
+                    ${helmet.title.toString()}
+                    <link rel="shortcut icon" href="/static/favicon.ico"/>
                     <body>
                     <noscript>You need to enable JavaScript to run this app.</noscript>
                     <div id="root">${content}</div>
