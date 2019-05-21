@@ -50,7 +50,8 @@ const Header = ({ ModalActions, logged, setLogged }: Props) => {
                             setLoading(true);
                             new Promise((resolve, reject) => {
                                 setTimeout(() => {
-                                    localStorage.clear();
+                                    typeof window !== 'undefined' &&
+                                        localStorage.clear();
                                     setLogged(false);
                                     setLoading(false);
                                     resolve();

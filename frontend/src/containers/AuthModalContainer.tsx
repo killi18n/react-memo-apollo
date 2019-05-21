@@ -83,14 +83,15 @@ const AuthModalContainer = () => {
                             error,
                         } = findUserByNameAndPassword;
                         if (jwt && name && _id) {
-                            localStorage.setItem(
-                                'userInfo',
-                                JSON.stringify({
-                                    jwt,
-                                    name,
-                                    _id,
-                                })
-                            );
+                            typeof window !== 'undefined' &&
+                                localStorage.setItem(
+                                    'userInfo',
+                                    JSON.stringify({
+                                        jwt,
+                                        name,
+                                        _id,
+                                    })
+                                );
                             setLogged(true);
                             initializeInput();
                             initializeError();
@@ -165,14 +166,15 @@ const AuthModalContainer = () => {
                                 });
                                 return;
                             }
-                            localStorage.setItem(
-                                'userInfo',
-                                JSON.stringify({
-                                    jwt,
-                                    name,
-                                    _id,
-                                })
-                            );
+                            typeof window !== 'undefined' &&
+                                localStorage.setItem(
+                                    'userInfo',
+                                    JSON.stringify({
+                                        jwt,
+                                        name,
+                                        _id,
+                                    })
+                                );
                             setLogged(true);
                             initializeInput();
                             initializeError();

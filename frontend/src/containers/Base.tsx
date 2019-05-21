@@ -19,7 +19,8 @@ const CHECK_USER_LOGGED_IN = gql`
 const Base = () => {
     const dispatch = useDispatch();
     const AuthActions = bindActionCreators(authActions, dispatch);
-    const userInfo = localStorage.getItem('userInfo');
+    const userInfo =
+        typeof window !== 'undefined' ? localStorage.getItem('userInfo') : null;
     if (!userInfo) {
         return null;
     } else {
@@ -33,7 +34,7 @@ const Base = () => {
                 }
                 if (error) {
                     AuthActions.setLogged(false);
-                    localStorage.clear();
+                    typeof window !== 'undefined' && localStorage.clear();
                 }
                 return null;
             }}

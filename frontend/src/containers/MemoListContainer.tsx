@@ -121,7 +121,8 @@ const MemoListContainer = ({ client }: Props) => {
                                     document: MEMO_SUBSCRIPTION,
                                     onError: (err: any) => {
                                         if (err.message === 'not logged in') {
-                                            localStorage.clear();
+                                            typeof window !== 'undefined' &&
+                                                localStorage.clear();
                                             window.location.reload();
                                         }
                                     },

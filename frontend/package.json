@@ -86,6 +86,8 @@
     "scripts": {
         "start": "node scripts/start.js",
         "build": "node scripts/build.js",
+        "build:ssr": "node scripts/build.server.js",
+        "start:ssr": "node build/server/bundle.js",
         "test": "node scripts/test.js"
     },
     "eslintConfig": {

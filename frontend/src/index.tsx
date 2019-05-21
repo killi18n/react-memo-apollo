@@ -20,15 +20,19 @@ const rootElement = document.getElementById('root');
 // const userInfoStorage = localStorage.getItem('userInfo');
 
 const authLink = setContext((_, { headers }) => {
-    if (!localStorage.getItem('userInfo')) {
-        return {
-            headers: {
-                ...headers,
-                authorization: '',
-            },
-        };
+    if (typeof window !== 'undefined') {
+        if (!localStorage.getItem('userInfo')) {
+            return {
+                headers: {
+                    ...headers,
+                    authorization: '',
+                },
+            };
+        }
     }
-    const checkStorage = localStorage.getItem('userInfo');
+
+    const checkStorage =
+        typeof window !== 'undefined' ? localStorage.getItem('userInfo') : null;
     const token = checkStorage ? JSON.parse(checkStorage).jwt : '';
     return {
         headers: {
@@ -51,7 +55,10 @@ const wsLink = new WebSocketLink({
         lazy: true,
         reconnect: true,
         connectionParams: () => {
-            const checkStorage = localStorage.getItem('userInfo');
+            const checkStorage =
+                typeof window !== 'undefined'
+                    ? localStorage.getItem('userInfo')
+                    : null;
             return {
                 headers: {
                     Authorization: checkStorage
